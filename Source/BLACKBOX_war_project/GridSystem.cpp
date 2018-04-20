@@ -8,15 +8,13 @@
 // Sets default values
 AGridSystem::AGridSystem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it. Is overidden bei blueprint?
 	PrimaryActorTick.bCanEverTick = false;
+	//this->SetActorTicksEnables(true/false)
+	//PrimaryActorTick.bStartWithTickEnabled
 
 	hexagonBase = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("hexagonBase"));
-}
-
-void AGridSystem::BeginPlay()
-{
-	Super::BeginPlay();
+	hexagonBase->SetCollisionProfileName(FName("BlockAll"));
 }
 
 void AGridSystem::PostInitProperties()
@@ -32,6 +30,13 @@ void AGridSystem::PostInitProperties()
 		horizontalSpacing = width;
 		verticalSpacing = height * 0.75f;
 	}
+}
+
+void AGridSystem::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetupGridLayout();
 }
 
 FVector AGridSystem::getHexagonWorldLocation(uint8 column, uint8 row)
