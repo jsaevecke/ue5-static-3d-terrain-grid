@@ -14,38 +14,41 @@ AGridSystem::AGridSystem()
 	hexagonBase = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("hexagonBase"));
 }
 
-// Called when the game starts or when spawned
 void AGridSystem::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ensure(hexagonBase != nullptr);
-
-	UStaticMesh* staticMesh = hexagonBase->GetStaticMesh();
-
-	ensure(staticMesh != nullptr);
-
-	size = staticMesh->GetBoundingBox().Max.X;
-	height = size * 2.f;
-	width = sqrt(3.f) / 2.f * height;
-	horizontalSpacing = width;
-	verticalSpacing = height * 0.75f;
-
-	UE_LOG(LogTemp, Warning, TEXT("Hex Props - size: %f - height: %f - width: %f - vsp: %f - hsp: %f"), size, height, width, verticalSpacing, horizontalSpacing);
-
-	Setup();
 }
 
-void AGridSystem::Setup()
+void AGridSystem::PostInitProperties()
 {
-	for (uint8 currentColumn = 0; currentColumn < columns; ++currentColumn)
+	Super::PostInitProperties();
+
+	//Calculate properties needed for proper positioning of tiles in the grid
+	if (hexagonBase && hexagonBase->GetStaticMesh())
 	{
-		for (uint8 currentRow = 0; currentRow < rows; ++currentRow)
+		size = hexagonBase->GetStaticMesh()->GetBoundingBox().Max.X;
+		height = size * 2.f;
+		width = sqrt(3.f) / 2.f * height;
+		horizontalSpacing = width;
+		verticalSpacing = height * 0.75f;
+	}
+}
+
+FVector AGridSystem::getHexagonWorldLocation(uint8 column, uint8 row)
+{
+	return FVector{ horizontalSpacing * (column + row / 2.f), verticalSpacing * row, 25.f };
+}
+
+void AGridSystem::SetupGridLayout_Implementation()
+{
+	if (hexagonBase)
+	{
+		for (uint8 currentColumn = 0; currentColumn < columns; ++currentColumn)
 		{
-			FVector location{ horizontalSpacing * (currentColumn + currentRow/2.f), verticalSpacing * currentRow, 25.f };
-			UE_LOG(LogTemp, Warning, TEXT("Hex Props - Position: %s"), *location.ToString());
-			FTransform newInstanceTransform{ location };
-			hexagonBase->AddInstance(newInstanceTransform);
+			for (uint8 currentRow = 0; currentRow < rows; ++currentRow)
+			{
+				hexagonBase->AddInstance(FTransform{ getHexagonWorldLocation(currentColumn, currentRow) });
+			}
 		}
 	}
 }
