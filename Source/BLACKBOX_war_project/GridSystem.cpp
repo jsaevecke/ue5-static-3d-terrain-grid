@@ -24,7 +24,8 @@ void AGridSystem::PostInitProperties()
 	//Calculate properties needed for proper positioning of tiles in the grid
 	if (hexagonBase && hexagonBase->GetStaticMesh())
 	{
-		size = hexagonBase->GetStaticMesh()->GetBoundingBox().Max.X;
+		size = hexagonBase->GetStaticMesh()->GetBoundingBox().Max.Y;
+		UE_LOG(LogTemp, Warning, TEXT("%i"), size)
 		height = size * 2.f;
 		width = sqrt(3.f) / 2.f * height;
 		horizontalSpacing = width;
