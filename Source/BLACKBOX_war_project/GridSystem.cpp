@@ -52,7 +52,8 @@ void AGridSystem::SetupGridLayout_Implementation()
 		{
 			for (uint8 currentRow = 0; currentRow < rows; ++currentRow)
 			{
-				hexagonBase->AddInstance(FTransform{ getHexagonWorldLocation(currentColumn, currentRow) });
+				int32 index = hexagonBase->AddInstance(FTransform{ getHexagonWorldLocation(currentColumn, currentRow) });
+				UE_LOG(LogTemp, Warning, TEXT("%i"), index);
 			}
 		}
 	}
