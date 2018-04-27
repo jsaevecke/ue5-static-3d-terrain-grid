@@ -14,7 +14,7 @@ AGridSystem::AGridSystem()
 	//PrimaryActorTick.bStartWithTickEnabled
 
 	HexBase = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("HexBase"));
-	HexBase->SetCollisionProfileName(FName("BlockAll"));
+	HexBase->SetCollisionProfileName(FName("Grid"));
 	Dimensions = FIntVector(1.f);
 }
 
@@ -40,9 +40,15 @@ FIntVector AGridSystem::GetGridDimensions()
 {
 	return Dimensions;
 }
-FVector AGridSystem::GetHexWorldLocation(FIntVector coordinates)
+FVector AGridSystem::HexGridLocationToWorldLocation(FIntVector coordinates)
 {
 	return FVector{ HexMeasurements.HorizontalSpacing * (coordinates.X + coordinates.Y / 2.f), HexMeasurements.VerticalSpacing * coordinates.Y, 25.f };
+}
+FIntVector AGridSystem::HexWorldLocationToGridLocation(FVector worldLocation)
+{
+	int32 coordY = (int32)(worldLocation.Y / HexMeasurements.VerticalSpacing);
+	int32 coordX = (int32)((worldLocation.X / HexMeasurements.HorizontalSpacing) - coordY / 2.f);
+	return FIntVector{ coordX, coordY, 1 };
 }
 FHexMeasurements AGridSystem::GetHexMeasurements()
 {
@@ -57,7 +63,7 @@ void AGridSystem::SetupGridLayout_Implementation()
 		{
 			for (uint8 currentRow = 0; currentRow < Dimensions.Y; ++currentRow)
 			{
-				int32 index = HexBase->AddInstance(FTransform{ GetHexWorldLocation(FIntVector(currentColumn, currentRow, 0.f)) });
+				int32 index = HexBase->AddInstance(FTransform{ HexGridLocationToWorldLocation(FIntVector(currentColumn, currentRow, 0.f)) });
 			}
 		}
 	}

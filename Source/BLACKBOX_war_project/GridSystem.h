@@ -1,5 +1,7 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
+//TODO: When to use const and & properly
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -15,10 +17,12 @@ struct FHexTileData
 public:
 	FHexTileData() {}
 
-	UPROPERTY(VisibleAnywhere)
-	uint8 X;
-	UPROPERTY(VisibleAnywhere)
-	uint8 Y;
+	UPROPERTY(VisibleAnywhere, Category = "Position")
+	FIntVector GridCoordinates;
+	UPROPERTY(VisibleAnywhere, Category = "Position")
+	FVector WorldCoordinates;
+	UPROPERTY(VisibleAnywhere, Category = "Properties")
+	FName HexType;
 };
 
 USTRUCT(BlueprintType)
@@ -63,8 +67,8 @@ class BLACKBOX_WAR_PROJECT_API AGridSystem : public AActor
 public:	
 	AGridSystem();
 
-	//Should be a map <string, ism> - the key is an identifier for the ism, that identifier helps to spawn the correct ism's while loading a level
 	//Visual representation of the grid
+	//TODO: Should be a map <string, ism> - the key is an identifier for the ism, that identifier helps to spawn the correct ism's while loading a level
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hexagon|Static Meshes")
 	UInstancedStaticMeshComponent* HexBase = nullptr;
 
@@ -81,20 +85,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Layout")
 	FIntVector GetGridDimensions();
 
-	//Calculates hexagon world position based on the column and row
+	//TODO: Does it belong here?
+	//TODO:WorldToGrid may only function if its the exact world location of the hex
 	UFUNCTION(BlueprintCallable, Category = "Hexagon")
-	FVector GetHexWorldLocation(FIntVector coordinates);
+	FVector HexGridLocationToWorldLocation(FIntVector coordinates);
+	UFUNCTION(BlueprintCallable, Category = "Hexagon")
+	FIntVector HexWorldLocationToGridLocation(FVector worldLocation);
+
 	UFUNCTION(BlueprintCallable, Category = "Hexagon")
 	FHexMeasurements GetHexMeasurements();
-
-	//TODO: When to use const and & properly
-private:
-
+	
 protected:
-	//How many columns and rows the grid has
+	//How many columns and rows the grid has or how big the grid is
 	UPROPERTY(EditAnywhere, Category = "Layout")
 	FIntVector Dimensions;
 
+	//Calculated measurements of the base hexagon mesh - needed to place the hexagons on the right location
 	UPROPERTY(VisibleAnywhere, Category = "Hexagon")
 	FHexMeasurements HexMeasurements;
 
