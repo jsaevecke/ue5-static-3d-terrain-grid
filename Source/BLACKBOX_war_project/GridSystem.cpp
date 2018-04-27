@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2018, Julien Saevecke, All rights reserved.
 
 #include "GridSystem.h"
 #include "Engine/StaticMesh.h"
@@ -13,8 +13,9 @@ AGridSystem::AGridSystem()
 	//this->SetActorTicksEnables(true/false)
 	//PrimaryActorTick.bStartWithTickEnabled
 
-	hexagonBase = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("hexagonBase"));
-	hexagonBase->SetCollisionProfileName(FName("BlockAll"));
+	HexBase = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("HexBase"));
+	HexBase->SetCollisionProfileName(FName("BlockAll"));
+	Dimensions = FIntVector(1.f);
 }
 
 void AGridSystem::PostInitProperties()
@@ -22,14 +23,9 @@ void AGridSystem::PostInitProperties()
 	Super::PostInitProperties();
 
 	//Calculate properties needed for proper positioning of tiles in the grid
-	if (hexagonBase && hexagonBase->GetStaticMesh())
+	if (HexBase && HexBase->GetStaticMesh())
 	{
-		size = hexagonBase->GetStaticMesh()->GetBoundingBox().Max.Y;
-		UE_LOG(LogTemp, Warning, TEXT("%i"), size)
-		height = size * 2.f;
-		width = sqrt(3.f) / 2.f * height;
-		horizontalSpacing = width;
-		verticalSpacing = height * 0.75f;
+		HexMeasurements = FHexMeasurements(HexBase->GetStaticMesh()->GetBoundingBox().Max.Y);
 	}
 }
 
@@ -40,21 +36,28 @@ void AGridSystem::BeginPlay()
 	SetupGridLayout();
 }
 
-FVector AGridSystem::getHexagonWorldLocation(uint8 column, uint8 row)
+FIntVector AGridSystem::GetGridDimensions()
 {
-	return FVector{ horizontalSpacing * (column + row / 2.f), verticalSpacing * row, 25.f };
+	return Dimensions;
+}
+FVector AGridSystem::GetHexWorldLocation(FIntVector coordinates)
+{
+	return FVector{ HexMeasurements.HorizontalSpacing * (coordinates.X + coordinates.Y / 2.f), HexMeasurements.VerticalSpacing * coordinates.Y, 25.f };
+}
+FHexMeasurements AGridSystem::GetHexMeasurements()
+{
+	return HexMeasurements;
 }
 
 void AGridSystem::SetupGridLayout_Implementation()
 {
-	if (hexagonBase)
+	if (HexBase)
 	{
-		for (uint8 currentColumn = 0; currentColumn < columns; ++currentColumn)
+		for (uint8 currentColumn = 0; currentColumn < Dimensions.X; ++currentColumn)
 		{
-			for (uint8 currentRow = 0; currentRow < rows; ++currentRow)
+			for (uint8 currentRow = 0; currentRow < Dimensions.Y; ++currentRow)
 			{
-				int32 index = hexagonBase->AddInstance(FTransform{ getHexagonWorldLocation(currentColumn, currentRow) });
-				UE_LOG(LogTemp, Warning, TEXT("%i"), index);
+				int32 index = HexBase->AddInstance(FTransform{ GetHexWorldLocation(FIntVector(currentColumn, currentRow, 0.f)) });
 			}
 		}
 	}

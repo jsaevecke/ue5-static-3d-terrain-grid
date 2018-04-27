@@ -13,8 +13,4 @@ UCLASS()
 class BLACKBOX_WAR_PROJECT_API ABLACKBOX_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
-	
-	
-	
 };
