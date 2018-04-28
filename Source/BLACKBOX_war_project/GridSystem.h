@@ -10,22 +10,25 @@
 
 class UInstancedStaticMeshComponent;
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Category = "Grid|Hexagon|Data")
 struct FHexTileData
 {
 	GENERATED_BODY()
 public:
 	FHexTileData() {}
 
-	UPROPERTY(VisibleAnywhere, Category = "Position")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category ="Grid|Hexagon|Data|Tile")
 	FIntVector GridCoordinates;
-	UPROPERTY(VisibleAnywhere, Category = "Position")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
 	FVector WorldCoordinates;
-	UPROPERTY(VisibleAnywhere, Category = "Properties")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
+	int32 Index;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
 	FName HexType;
+	
 };
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Category = "Grid|Hexagon|Data")
 struct FHexMeasurements
 {
 	GENERATED_BODY()
@@ -44,19 +47,19 @@ public:
 	}
 
 	//The radius of the hexagon
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Measurements")
 	float Radius = 0.f;
 	//The Width of the hexagon
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Measurements")
 	float Width = 0.f;
 	//The Height of the hexagon
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Measurements")
 	float Height = 0.f;
 	//The vertical distance between hexagons
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Measurements")
 	float VerticalSpacing = 0.f;
-	//The horizontal distance between hexagons
-	UPROPERTY(VisibleAnywhere)
+	//The horizontal distance between hexagon
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Measurements")
 	float HorizontalSpacing = 0.f;
 };
 
@@ -69,7 +72,7 @@ public:
 
 	//Visual representation of the grid
 	//TODO: Should be a map <string, ism> - the key is an identifier for the ism, that identifier helps to spawn the correct ism's while loading a level
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hexagon|Static Meshes")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid|Hexagon|Static Meshes")
 	UInstancedStaticMeshComponent* HexBase = nullptr;
 
 protected:
@@ -79,32 +82,35 @@ protected:
 
 public:
 	//Sets the layout for the hexagon grid, can be overriden by blueprints to generate various grids for gameplay
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Layout")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid|Layout")
 	void SetupGridLayout();
 
-	UFUNCTION(BlueprintCallable, Category = "Layout")
-	FIntVector GetGridDimensions();
+	UFUNCTION(BlueprintCallable, Category = "Grid|Layout")
+	FIntVector GetGridDimensions() const;
 
 	//TODO: Does it belong here?
 	//TODO:WorldToGrid may only function if its the exact world location of the hex
-	UFUNCTION(BlueprintCallable, Category = "Hexagon")
-	FVector HexGridLocationToWorldLocation(FIntVector coordinates);
-	UFUNCTION(BlueprintCallable, Category = "Hexagon")
-	FIntVector HexWorldLocationToGridLocation(FVector worldLocation);
+	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|Helper")
+	FVector HexGridLocationToWorldLocation(const FIntVector coordinates) const;
+	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|Helper")
+	FIntVector HexWorldLocationToGridLocation(const FVector worldLocation) const;
 
-	UFUNCTION(BlueprintCallable, Category = "Hexagon")
+	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|Data")
 	FHexMeasurements GetHexMeasurements();
 	
+	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|Data")
+	const TArray<FHexTileData>& GetHexGridData() const;
+
 protected:
 	//How many columns and rows the grid has or how big the grid is
-	UPROPERTY(EditAnywhere, Category = "Layout")
+	UPROPERTY(EditAnywhere, Category = "Grid|Layout")
 	FIntVector Dimensions;
 
 	//Calculated measurements of the base hexagon mesh - needed to place the hexagons on the right location
-	UPROPERTY(VisibleAnywhere, Category = "Hexagon")
+	UPROPERTY(VisibleAnywhere, Category = "Grid|Hexagon|Data")
 	FHexMeasurements HexMeasurements;
 
 	//Data representation of the grid
-	UPROPERTY(VisibleAnywhere, Category = "Hexagon|Data")
-	TArray<FHexTileData> HexTileData;
+	UPROPERTY(VisibleAnywhere, Category = "Grid|Hexagon|Data")
+	TArray<FHexTileData> HexGridData;
 };

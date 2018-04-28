@@ -36,15 +36,15 @@ void AGridSystem::BeginPlay()
 	SetupGridLayout();
 }
 
-FIntVector AGridSystem::GetGridDimensions()
+FIntVector AGridSystem::GetGridDimensions() const
 {
 	return Dimensions;
 }
-FVector AGridSystem::HexGridLocationToWorldLocation(FIntVector coordinates)
+FVector AGridSystem::HexGridLocationToWorldLocation(const FIntVector coordinates) const
 {
 	return FVector{ HexMeasurements.HorizontalSpacing * (coordinates.X + coordinates.Y / 2.f), HexMeasurements.VerticalSpacing * coordinates.Y, 25.f };
 }
-FIntVector AGridSystem::HexWorldLocationToGridLocation(FVector worldLocation)
+FIntVector AGridSystem::HexWorldLocationToGridLocation(const FVector worldLocation) const
 {
 	int32 coordY = (int32)(worldLocation.Y / HexMeasurements.VerticalSpacing);
 	int32 coordX = (int32)((worldLocation.X / HexMeasurements.HorizontalSpacing) - coordY / 2.f);
@@ -54,16 +54,33 @@ FHexMeasurements AGridSystem::GetHexMeasurements()
 {
 	return HexMeasurements;
 }
+const TArray<FHexTileData>&  AGridSystem::GetHexGridData() const
+{
+	return HexGridData;
+}
 
 void AGridSystem::SetupGridLayout_Implementation()
 {
 	if (HexBase)
 	{
+		HexGridData.Reserve(Dimensions.X * Dimensions.Y);
+
 		for (uint8 currentColumn = 0; currentColumn < Dimensions.X; ++currentColumn)
 		{
 			for (uint8 currentRow = 0; currentRow < Dimensions.Y; ++currentRow)
 			{
-				int32 index = HexBase->AddInstance(FTransform{ HexGridLocationToWorldLocation(FIntVector(currentColumn, currentRow, 0.f)) });
+				FVector worldLocation{ HexGridLocationToWorldLocation({ currentColumn, currentRow, 0 }) };
+				FTransform hexTransform{ worldLocation };
+
+				int32 index = HexBase->AddInstance(hexTransform);
+				
+				FHexTileData hexTileData;
+				hexTileData.GridCoordinates = { currentColumn, currentRow, 0 };
+				hexTileData.WorldCoordinates = worldLocation;
+				hexTileData.Index = index;
+				hexTileData.HexType = { "Base" };
+
+				HexGridData.Add(hexTileData);
 			}
 		}
 	}
