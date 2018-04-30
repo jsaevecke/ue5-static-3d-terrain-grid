@@ -1,7 +1,5 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
-//TODO: When to use const and & properly
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,6 +7,8 @@
 #include "GridSystem.generated.h"
 
 class UInstancedStaticMeshComponent;
+class UStaticMeshComponent;
+class AGridHex;
 
 USTRUCT(BlueprintType, Category = "Grid|Hexagon|Data")
 struct FHexTileData
@@ -22,7 +22,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
 	FVector WorldCoordinates;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
-	int32 Index;
+	int32 ISMIndex;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
+	int32 DataIndex;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Grid|Hexagon|Data|Tile")
 	FName HexType;
 	
@@ -63,24 +65,13 @@ public:
 	float HorizontalSpacing = 0.f;
 };
 
-UCLASS()
+UCLASS(hidecategories = ("Default", "Actor Tick", "Rendering", "Input", "Actor", "LOD", "Replication"))
 class BLACKBOX_WAR_PROJECT_API AGridSystem : public AActor
 {
 	GENERATED_BODY()
 public:	
 	AGridSystem();
 
-	//Visual representation of the grid
-	//TODO: Should be a map <string, ism> - the key is an identifier for the ism, that identifier helps to spawn the correct ism's while loading a level
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid|Hexagon|Static Meshes")
-	UInstancedStaticMeshComponent* HexBase = nullptr;
-
-protected:
-	//Gets called before begin play - used to calculate properties that are based on default values set in the blueprint
-	virtual void PostInitProperties() override;
-	virtual void BeginPlay() override;
-
-public:
 	//Sets the layout for the hexagon grid, can be overriden by blueprints to generate various grids for gameplay
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Grid|Layout")
 	void SetupGridLayout();
@@ -97,9 +88,27 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|Data")
 	FHexMeasurements GetHexMeasurements();
-	
 	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|Data")
 	const TArray<FHexTileData>& GetHexGridData() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|ISM")
+	const TMap<FName, AGridHex*>& GetHexISMs() const;
+	UFUNCTION(BlueprintCallable, Category = "Grid|Hexagon|ISM")
+	AGridHex* const GetHexISM(const FName identifier) const;
+	
+protected:
+	//Gets called before begin play - used to calculate properties that are based on default values set in the blueprint
+	virtual void PostInitProperties() override;
+	virtual void BeginPlay() override;
+
+public:
+	//Base Model for calculating measurements
+	UPROPERTY(EditAnywhere, Category = "Grid|Hexagon|Data")
+	UStaticMeshComponent* HexMeasurementsModel = nullptr;
+
+	//Visual representation of the grid
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid|Hexagon|ISM")
+	TArray<TSubclassOf<AGridHex>> HexAssets;
 
 protected:
 	//How many columns and rows the grid has or how big the grid is
@@ -113,4 +122,7 @@ protected:
 	//Data representation of the grid
 	UPROPERTY(VisibleAnywhere, Category = "Grid|Hexagon|Data")
 	TArray<FHexTileData> HexGridData;
+
+	UPROPERTY(VisibleAnywhere, Category = "Grid|Hexagon|ISM")
+	TMap<FName, AGridHex*> InstancedHexISMs;
 };

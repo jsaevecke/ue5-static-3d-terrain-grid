@@ -3,18 +3,19 @@
 #include "GridSystem.h"
 #include "Engine/StaticMesh.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "GridHex.h"
 
 
 // Sets default values
 AGridSystem::AGridSystem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it. Is overidden bei blueprint?
+	SetActorTickEnabled(false);
 	PrimaryActorTick.bCanEverTick = false;
-	//this->SetActorTicksEnables(true/false)
-	//PrimaryActorTick.bStartWithTickEnabled
+	PrimaryActorTick.bStartWithTickEnabled = false;
 
-	HexBase = CreateDefaultSubobject<UInstancedStaticMeshComponent>(FName("HexBase"));
-	HexBase->SetCollisionProfileName(FName("Grid"));
+	HexMeasurementsModel = CreateDefaultSubobject<UStaticMeshComponent>(FName("HexBase"));
+	HexMeasurementsModel->SetHiddenInGame(true);
 	Dimensions = FIntVector(1.f);
 }
 
@@ -23,9 +24,9 @@ void AGridSystem::PostInitProperties()
 	Super::PostInitProperties();
 
 	//Calculate properties needed for proper positioning of tiles in the grid
-	if (HexBase && HexBase->GetStaticMesh())
+	if (HexMeasurementsModel && HexMeasurementsModel->GetStaticMesh())
 	{
-		HexMeasurements = FHexMeasurements(HexBase->GetStaticMesh()->GetBoundingBox().Max.Y);
+		HexMeasurements = FHexMeasurements(HexMeasurementsModel->GetStaticMesh()->GetBoundingBox().Max.Y);
 	}
 }
 
@@ -40,6 +41,7 @@ FIntVector AGridSystem::GetGridDimensions() const
 {
 	return Dimensions;
 }
+
 FVector AGridSystem::HexGridLocationToWorldLocation(const FIntVector coordinates) const
 {
 	return FVector{ HexMeasurements.HorizontalSpacing * (coordinates.X + coordinates.Y / 2.f), HexMeasurements.VerticalSpacing * coordinates.Y, 25.f };
@@ -50,6 +52,7 @@ FIntVector AGridSystem::HexWorldLocationToGridLocation(const FVector worldLocati
 	int32 coordX = (int32)((worldLocation.X / HexMeasurements.HorizontalSpacing) - coordY / 2.f);
 	return FIntVector{ coordX, coordY, 1 };
 }
+
 FHexMeasurements AGridSystem::GetHexMeasurements()
 {
 	return HexMeasurements;
@@ -59,28 +62,63 @@ const TArray<FHexTileData>&  AGridSystem::GetHexGridData() const
 	return HexGridData;
 }
 
+const TMap<FName, AGridHex*>& AGridSystem::GetHexISMs() const
+{
+	return InstancedHexISMs;
+}
+AGridHex* const AGridSystem::GetHexISM(const FName identifier) const
+{
+	if (InstancedHexISMs.Contains(identifier))
+	{
+		return InstancedHexISMs[identifier];
+	}
+
+	return nullptr;
+}
+
 void AGridSystem::SetupGridLayout_Implementation()
 {
-	if (HexBase)
+	for (auto hexAsset : HexAssets)
+	{
+		AGridHex* instancedHexISM = Cast<AGridHex>(GetWorld()->SpawnActor(hexAsset.Get()));
+		InstancedHexISMs.Add(instancedHexISM->Identifier, instancedHexISM);
+	}
+
+	if (HexAssets.Num() > 0)
 	{
 		HexGridData.Reserve(Dimensions.X * Dimensions.Y);
 
+		int32 dataIndex = 0;
 		for (uint8 currentColumn = 0; currentColumn < Dimensions.X; ++currentColumn)
 		{
 			for (uint8 currentRow = 0; currentRow < Dimensions.Y; ++currentRow)
 			{
+				AGridHex* instancedHexISM = nullptr;
+
+				if (currentColumn % 2 == 0 || currentRow % 2 == 0)
+				{
+					instancedHexISM = InstancedHexISMs["Base_01"];
+				}
+				else
+				{
+					instancedHexISM = InstancedHexISMs["Base_02"];
+				}
+
 				FVector worldLocation{ HexGridLocationToWorldLocation({ currentColumn, currentRow, 0 }) };
 				FTransform hexTransform{ worldLocation };
-
-				int32 index = HexBase->AddInstance(hexTransform);
+				
+				int32 ismIndex = instancedHexISM->HexISM->AddInstance(hexTransform);
 				
 				FHexTileData hexTileData;
 				hexTileData.GridCoordinates = { currentColumn, currentRow, 0 };
 				hexTileData.WorldCoordinates = worldLocation;
-				hexTileData.Index = index;
-				hexTileData.HexType = { "Base" };
+				hexTileData.ISMIndex = ismIndex;
+				hexTileData.DataIndex = dataIndex;
+				hexTileData.HexType = instancedHexISM->Type;
 
 				HexGridData.Add(hexTileData);
+
+				++dataIndex;
 			}
 		}
 	}

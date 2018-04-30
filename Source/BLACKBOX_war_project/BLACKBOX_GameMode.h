@@ -21,7 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	AGridSystem* GetHexagonGrid();
 private:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Grid")
 	TSubclassOf<class AGridSystem> GridToSpawn;
 	UPROPERTY()
 	AGridSystem* HexagonGrid = nullptr;
