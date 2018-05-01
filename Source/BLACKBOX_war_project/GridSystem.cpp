@@ -6,8 +6,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "GridHex.h"
 
-
-// Sets default values
 AGridSystem::AGridSystem()
 {
 	SetActorTickEnabled(false);
@@ -57,7 +55,7 @@ FHexMeasurements AGridSystem::GetHexMeasurements()
 {
 	return HexMeasurements;
 }
-const TArray<FHexTileData>&  AGridSystem::GetHexGridData() const
+const TArray<FHexData>&  AGridSystem::GetHexGridData() const
 {
 	return HexGridData;
 }
@@ -109,7 +107,7 @@ void AGridSystem::SetupGridLayout_Implementation()
 				
 				int32 ismIndex = instancedHexISM->HexISM->AddInstance(hexTransform);
 				
-				FHexTileData hexTileData;
+				FHexData hexTileData;
 				hexTileData.GridCoordinates = { currentColumn, currentRow, 0 };
 				hexTileData.WorldCoordinates = worldLocation;
 				hexTileData.ISMIndex = ismIndex;
