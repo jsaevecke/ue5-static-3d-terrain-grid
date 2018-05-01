@@ -23,4 +23,10 @@ public:
 	FName Identifier = "Unknown";
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hexagon")
 	UInstancedStaticMeshComponent* HexISM = nullptr;
+	/*
+	This grid is used to convert an InstancedStaticMesh index to an HexDataGrid index.
+	HexDataGridIndices[ISMIndex] = HexDataGridIndex
+	*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hexagon")
+	TArray<int32> HexDataGridIndices;
 };

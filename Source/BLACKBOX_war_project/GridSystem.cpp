@@ -107,6 +107,8 @@ void AGridSystem::SetupGridLayout_Implementation()
 				
 				int32 ismIndex = instancedHexISM->HexISM->AddInstance(hexTransform);
 				
+				instancedHexISM->HexDataGridIndices.Add(dataIndex);
+
 				FHexData hexTileData;
 				hexTileData.GridCoordinates = { currentColumn, currentRow, 0 };
 				hexTileData.WorldCoordinates = worldLocation;
