@@ -1,0 +1,199 @@
+// Copyright 2018, Julien Saevecke, All rights reserved.
+
+#include "Grid.h"
+#include "ObjectPool.h"
+#include "Engine/World.h"
+#include "Engine/DecalActor.h"
+#include "Components/DecalComponent.h"
+#include "EngineUtils.h"
+#include "Landscape.h"
+
+// Sets default values
+AGrid::AGrid()
+{
+	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+
+	float sqrt3 = sqrtf(3.f);
+
+	GridToWorldX = FVector2D(sqrt3, sqrt3 / 2.f);
+	GridToWorldY = FVector2D(0.f, 3.f / 2.f);
+
+	WorldToGridX = FVector2D(sqrt3 / 3.f, -1.f / 3.f);
+	WorldToGridY = FVector2D(0.f, 2.f / 3.f);
+
+	this->SetFolderPath(GridFolder);
+}
+AGrid::~AGrid()
+{
+	DestroyGrid();
+}
+
+// Called when the game starts or when spawned
+void AGrid::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SpawnGrid();
+}
+
+FVector2D AGrid::ConvertGridToWorld(const FVector2D& gridPosition)
+{
+	FVector2D offset = FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y);
+
+	FVector2D x = GridToWorldX * gridPosition;
+	FVector2D y = GridToWorldY * gridPosition;
+
+	return offset + FVector2D(x.X + x.Y, y.X + y.Y) * OuterRadius;
+}
+FVector2D AGrid::ConvertWorldToGrid(const FVector2D& worldPosition)
+{
+	FVector2D offset = FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y);
+	FVector2D offsetWorldPosition = worldPosition - offset;
+
+	FVector2D x = WorldToGridX * offsetWorldPosition;
+	FVector2D y = WorldToGridY * offsetWorldPosition;
+
+	FVector2D gridPosition = FVector2D(x.X + x.Y, y.X + y.Y);
+	
+	gridPosition = gridPosition / OuterRadius;
+
+	FVector fractional = FVector(gridPosition.X, gridPosition.Y, -gridPosition.X - gridPosition.Y);
+	FVector rounded = FVector(FMath::RoundToInt(fractional.X), FMath::RoundToInt(fractional.Y), FMath::RoundToInt(fractional.Z));
+	FVector diff = fractional - rounded;
+	
+	diff.X = FMath::Abs(diff.X);
+	diff.Y = FMath::Abs(diff.Y);
+	diff.Z = FMath::Abs(diff.Z);
+
+	if (diff.X > diff.Y && diff.X > diff.Z)
+	{
+		rounded.X = -rounded.Y - rounded.Z;
+	}
+	else if (diff.Y > diff.Z)
+	{
+		rounded.Y = -rounded.X - rounded.Z;
+	}
+	else
+	{
+		rounded.Z = -rounded.X - rounded.Y;
+	}
+
+	return FVector2D(rounded.X, rounded.Y);
+}
+
+FTileData AGrid::GetTileData(const FVector2D& gridPosition)
+{
+	FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
+
+	FTileData* tileData = GridData.Find(hash);
+
+	if (tileData)
+	{
+		return *tileData;
+	}
+
+	FTileData notValid;
+	notValid.State = ETileState::NotValid;
+
+	return notValid;
+}
+
+void AGrid::DetermineMeasurements()
+{
+	//@TODO: ERROR HANDLING
+	if (BPTileDecal)
+	{
+		ADecalActor* decalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
+		FVector decalSize = decalActor->GetDecal()->DecalSize;
+		OuterRadius = FMath::Max(decalSize.Y, decalSize.Z);
+		decalActor->Destroy();
+	}
+
+	VerticalSpacing = OuterRadius * 1.5f;
+	HorizontalSpacing = sqrtf(3.f) * OuterRadius;
+
+	for (TActorIterator<ALandscape> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		ALandscape *landscape = *ActorItr;
+
+		//@TODO: ERROR HANDLING
+		if (landscape)
+		{
+			FVector origin, extent;
+			landscape->GetActorBounds(false, origin, extent);
+			MinLandscapeBounds = origin - extent;
+			MaxLandscapeBounds = origin + extent;
+			AbsoluteLandscapeSize = MaxLandscapeBounds - MinLandscapeBounds;
+			HorizontalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.X / HorizontalSpacing);
+			VerticalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.Y / VerticalSpacing);
+
+			break;
+		}
+	}
+}
+
+void AGrid::SpawnGrid()
+{
+	DestroyGrid();
+
+	DetermineMeasurements();
+
+	for (int32 row = 1; row < VerticalTileCount; ++row)
+	{
+		FVector2D indices = UStaticGridLibrary::CalculateOffsetIndices(row, HorizontalTileCount);
+
+		if (row % 2 == 0)
+		{
+			indices.X = indices.X + 1;
+		}
+		else
+		{
+			indices.Y = indices.Y - 1;
+		}
+
+		for (int32 column = indices.X; column < indices.Y; ++column)
+		{
+			AddTile(FVector2D(column, row));
+		}
+	}
+}
+
+void AGrid::DestroyGrid()
+{
+	GridData.Empty();
+
+	if (TilePool)
+	{
+		//@TODO: CLEAR THE TILES!
+		TilePool->Destroy();
+	}
+	
+}
+
+void AGrid::AddTile(const FVector2D& gridPosition)
+{
+	FVector2D worldPosition = ConvertGridToWorld(gridPosition);
+
+	bool isNonWalkable = false;
+	bool hit = UStaticGridLibrary::IsWalkable(GetWorld(), FVector(worldPosition.X, worldPosition.Y, 0.f), LineTraceLength, isNonWalkable, WalkableObjects, NonWalkableObjects);
+	
+	FTileData tileData;
+	tileData.GridPosition = FVector(gridPosition.X, gridPosition.Y, -gridPosition.X - gridPosition.Y);
+	tileData.WorldPosition = FVector(worldPosition.X, worldPosition.Y, 0.f);
+
+	if (hit)
+	{
+		tileData.State = ETileState::Walkable;
+	}
+	else if (isNonWalkable)
+	{
+		tileData.State = ETileState::Obstructed;
+	}
+
+	if (hit || isNonWalkable)
+	{
+		FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
+		GridData.Add(hash, tileData);
+	}
+}
