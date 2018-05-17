@@ -1,5 +1,6 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
+// TODO: Comments, Function Descriptions, Class Descriptions
 #pragma once
 
 #include "CoreMinimal.h"
@@ -20,58 +21,63 @@ public:
 	AGrid();
 	~AGrid();
 
-	UFUNCTION(BlueprintCallable, Category="Grid|Conversion")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	void Spawn();
+
+	UFUNCTION(BlueprintCallable, Category="Grid")
 	FVector2D ConvertGridToWorld(const FVector2D&  gridPosition);
-	UFUNCTION(BlueprintCallable, Category = "Grid|Conversion")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
 	FVector2D ConvertWorldToGrid(const FVector2D&  worldPosition);
 
-	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	FTileData GetTileData(const FVector2D& gridPosition);
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	const FTileData& AddTile(const FVector2D& gridPosition);
+
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	const FTileData& GetTile(const FVector2D& gridPosition);
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	const TMap<FString, FTileData>& GetAllTiles();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
 	UFUNCTION()
-	void DetermineMeasurements();
-	UFUNCTION()
-	void SpawnGrid();
-	UFUNCTION()
-	void DestroyGrid();
+	void Destroy();
 
 	UFUNCTION()
-	void AddTile(const FVector2D& gridPosition);
+	void DetermineMeasurements();
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Grid|Tile")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|Graphics")
 	TSubclassOf<ADecalActor> BPTileDecal;
 
-	UPROPERTY(EditDefaultsOnly, Category = "WorldOutliner")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|Organisation")
 	FName GridFolder;
-	UPROPERTY(EditDefaultsOnly, Category = "WorldOutliner")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|Organisation")
 	FName PoolFolder;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Grid|Tile")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|Navigation")
 	TArray<TEnumAsByte<ECollisionChannel>> WalkableObjects;
-	UPROPERTY(EditDefaultsOnly, Category = "Grid|Tile")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|Navigation")
 	TArray<TEnumAsByte<ECollisionChannel>> NonWalkableObjects;
-	UPROPERTY(EditDefaultsOnly, Category = "Grid|Tile")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|Navigation")
 	float LineTraceLength;
 
 private:
 	UPROPERTY()
 	AObjectPool* TilePool = nullptr;
+
+	UPROPERTY()
+	TMap<FString, FTileData> Tiles;
+	UPROPERTY()
+	FTileData InvalidTile;
+
 	UPROPERTY()
 	float OuterRadius;
 	UPROPERTY()
 	float VerticalSpacing;
 	UPROPERTY()
 	float HorizontalSpacing;
-
-	UPROPERTY()
-	TMap<FString, FTileData> GridData;
-
 	UPROPERTY()
 	FVector MinLandscapeBounds;
 	UPROPERTY()
@@ -87,7 +93,6 @@ private:
 	FVector2D GridToWorldX;
 	UPROPERTY()
 	FVector2D GridToWorldY;
-
 	UPROPERTY()
 	FVector2D WorldToGridX;
 	UPROPERTY()

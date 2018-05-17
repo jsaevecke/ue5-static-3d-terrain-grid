@@ -15,11 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	AObjectPool();
 
-	UFUNCTION(BlueprintCallable, Category = "Pool")
-	AActor* GetObject();
-	UFUNCTION(BlueprintCallable, Category = "Pool")
-	void ReturnObject(AActor* object);
-	UFUNCTION(BlueprintCallable, Category = "Pool")
+	UFUNCTION(BlueprintCallable, Category = "ObjectPool")
+	AActor* const GetObject();
+	UFUNCTION(BlueprintCallable, Category = "ObjectPool")
+	void ReturnObject(AActor* const object);
+	UFUNCTION(BlueprintCallable, Category = "ObjectPool")
 	void Empty();
 
 protected:
@@ -30,19 +30,19 @@ private:
 	UFUNCTION()
 	void ReserveObjects();
 	UFUNCTION()
-	AActor* CreateObject(bool isInUse);
+	AActor* const CreateObject(bool isInUse);
 
 public:		
-	UPROPERTY(EditDefaultsOnly, Category = "Pool")
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	TSubclassOf<AActor> ObjectToPool;
-	UPROPERTY(EditDefaultsOnly, Category = "Pool")
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	uint16 ReserveObjectCount;
-	UPROPERTY(EditDefaultsOnly, Category = "Pool")
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	uint16 MaxObjectCount;
 
-	UPROPERTY(EditDefaultsOnly, Category = "WorldOutliner")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|WorldOutliner")
 	FName PoolFolder;
-	UPROPERTY(EditDefaultsOnly, Category = "WorldOutliner")
+	UPROPERTY(EditDefaultsOnly, Category = "Config|WorldOutliner")
 	FName ObjectFolder;
 
 private:

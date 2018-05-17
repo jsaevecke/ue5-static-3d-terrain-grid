@@ -7,15 +7,16 @@
 #include "Engine/World.h"
 #include "StaticGridLibrary.generated.h"
 
-UENUM(BlueprintType, Category="Grid|Tile")
+UENUM(BlueprintType, Category="Grid")
 enum class ETileState : uint8
 {
 	Walkable,
 	Obstructed,
-	NotValid
+	NotValid,
+	Default = NotValid
 };
 
-USTRUCT(BlueprintType, Category = "Grid|Tile")
+USTRUCT(BlueprintType, Category = "Grid")
 struct FTileNavData
 {
 	GENERATED_BODY()
@@ -26,7 +27,7 @@ struct FTileNavData
 	float HCost;
 };
 
-USTRUCT(BlueprintType, Category="Grid|Tile")
+USTRUCT(BlueprintType, Category="Grid")
 struct FTileData
 {
 	GENERATED_BODY()
@@ -38,7 +39,7 @@ struct FTileData
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Data")
 	ETileState State;
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Data")
-	FTileNavData navData;
+	FTileNavData NavData;
 };
 
 /**
@@ -50,13 +51,13 @@ class BLACKBOX_WAR_PROJECT_API UStaticGridLibrary : public UObject
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Grid|Tile")
+	UFUNCTION(BlueprintCallable, Category="Grid")
 	static FORCEINLINE bool IsValidTile(const FTileData& tileData)
 	{
 		return !(tileData.State == ETileState::NotValid);
 	}
 
-	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FORCEINLINE FVector2D CalculateOffsetIndices(int32 row, int32 width)
 	{
 		int32 x = FMath::FloorToInt(row / 2.f);
@@ -64,12 +65,12 @@ public:
 		return FVector2D(x * (-1), y);
 	}
 
-	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FORCEINLINE FString GetTileHash(const FVector2D& gridPosition)
 	{
 		return FString::FromInt(static_cast<int>(gridPosition.X)) + "_" + FString::FromInt(static_cast<int>(gridPosition.Y));
 	}
 
-	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static bool IsWalkable(UWorld* const world, const FVector& worldPosition, float lineTraceLength, bool& isNonWalkable, TArray<TEnumAsByte<ECollisionChannel>> walkableObjects, TArray<TEnumAsByte<ECollisionChannel>> nonWalkableObjects);
 };

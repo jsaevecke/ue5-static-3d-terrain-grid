@@ -27,7 +27,7 @@ void AObjectPool::ReserveObjects()
 	}
 }
 
-AActor* AObjectPool::CreateObject(bool isInUse)
+AActor* const AObjectPool::CreateObject(bool isInUse)
 {
 	if (ObjectToPool && (CurrentObjectCount < MaxObjectCount || MaxObjectCount == 0))
 	{
@@ -50,11 +50,11 @@ AActor* AObjectPool::CreateObject(bool isInUse)
 	return nullptr;
 }
 
-AActor* AObjectPool::GetObject()
+AActor* const AObjectPool::GetObject()
 {
 	if (NotInUseObjects.Num() > 0)
 	{
-		AActor* object = NotInUseObjects.Pop();
+		AActor* const object = NotInUseObjects.Pop();
 
 		InUseObjects.Add(object);
 
@@ -66,7 +66,7 @@ AActor* AObjectPool::GetObject()
 	}
 }
 
-void AObjectPool::ReturnObject(AActor* object)
+void AObjectPool::ReturnObject(AActor* const object)
 {
 	int32 index;
 	if (InUseObjects.Find(object, index))
