@@ -173,13 +173,28 @@ const TMap<FString, FTileData>& AGrid::GetAllTiles()
 	return Tiles;
 }
 
-void AGrid::FindPath(const FTileData& start, const FTileData& end)
+void AGrid::FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& pathOUT)
 {
 
 }
-void AGrid::GetTilesInRange(const FTileData& origin, uint8 range)
-{
 
+// TODO: Think about returning just Vectors instead of whole FTileData structs?
+void AGrid::GetTilesInRange(const FVector2D& origin, const uint8 range, TArray<FTileData>& tilesOUT)
+{
+	for (int16 column = -range; column <= range; ++column)
+	{
+		for (int16 row = FMath::Max<int16>(-range, -column-range); row <= FMath::Min<int16>(range, -column+range); ++row)
+		{
+			FString hash = UStaticGridLibrary::GetTileHash(origin + FVector2D(column, row));
+
+			FTileData* tileData = Tiles.Find(hash);
+			
+			if (tileData != nullptr)
+			{
+				tilesOUT.Add(*tileData);
+			}
+		}
+	}
 }
 
 void AGrid::BeginPlay()

@@ -2,17 +2,24 @@
 
 #pragma once
 
+#include <limits>
+
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/World.h"
 #include "StaticGridLibrary.generated.h"
 
+
 UENUM(BlueprintType, Category="Grid")
 enum class ETileState : uint8
 {
+	NotValid,
 	Walkable,
 	Obstructed,
-	NotValid,
+	RangeIndicator,
+	Path,
+	PathStart,
+	PathEnd,
 	Default = NotValid
 };
 
@@ -25,6 +32,11 @@ struct FTileNavData
 	float GCost;
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Nav")
 	float HCost;
+
+	FTileNavData() 
+		: GCost(std::numeric_limits<float>::max()), HCost(std::numeric_limits<float>::max())
+	{
+	}
 };
 
 USTRUCT(BlueprintType, Category="Grid")
@@ -40,6 +52,12 @@ struct FTileData
 	ETileState State;
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Data")
 	FTileNavData NavData;
+
+	FTileData()
+		: GridPosition(0.f, 0.f, 0.f), WorldPosition(0.f, 0.f, 0.f), State(ETileState::NotValid), NavData()
+	{
+
+	}
 };
 
 /**

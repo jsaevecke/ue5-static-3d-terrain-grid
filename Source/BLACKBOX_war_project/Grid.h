@@ -3,6 +3,7 @@
 // TODO: Comments, Function Descriptions, Class Descriptions
 // TODO: Pathfinding
 // TODO: Default Walkable/NonWalkable/Raycast Length
+// TODO: Variable naming convention (C++&Blueprint)
 
 #pragma once
 
@@ -45,9 +46,9 @@ public:
 	const TMap<FString, FTileData>& GetAllTiles();
 
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void FindPath(const FTileData& start, const FTileData& end);
+	void FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& path);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void GetTilesInRange(const FTileData& origin, uint8 range);
+	void GetTilesInRange(const FVector2D& origin, uint8 range, TArray<FTileData>& tiles);
 
 protected:
 	virtual void BeginPlay() override;
