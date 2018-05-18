@@ -8,7 +8,6 @@
 #include "EngineUtils.h"
 #include "Landscape.h"
 
-// Sets default values
 AGrid::AGrid()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -102,6 +101,60 @@ FVector2D AGrid::ConvertWorldToGrid(const FVector2D& worldPosition)
 	return FVector2D(rounded.X, rounded.Y);
 }
 
+const FTileData& AGrid::AddTile(const FVector2D& gridPosition)
+{
+	FVector2D worldPosition = ConvertGridToWorld(gridPosition);
+
+	bool isNonWalkable = false;
+	bool hit = UStaticGridLibrary::IsWalkable(GetWorld(), FVector(worldPosition.X, worldPosition.Y, 0.f), LineTraceLength, isNonWalkable, WalkableObjects, NonWalkableObjects);
+
+	FTileData tileData;
+	tileData.GridPosition = FVector(gridPosition.X, gridPosition.Y, -gridPosition.X - gridPosition.Y);
+	tileData.WorldPosition = FVector(worldPosition.X, worldPosition.Y, 0.f);
+
+	if (hit)
+	{
+		tileData.State = ETileState::Walkable;
+	}
+	else if (isNonWalkable)
+	{
+		tileData.State = ETileState::Obstructed;
+	}
+
+
+	if (hit || isNonWalkable)
+	{
+		FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
+		Tiles.Add(hash, tileData);
+		return Tiles[hash];
+	}
+
+	return InvalidTile;
+}
+bool AGrid::RemoveTile(const FVector2D& gridPosition)
+{
+	FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
+
+	if (Tiles.Contains(hash))
+	{
+		Tiles.Remove(hash);
+		return true;
+	}
+
+	return false;
+}
+bool AGrid::UpdateTile(const FTileData& tileData)
+{
+	FString hash = UStaticGridLibrary::GetTileHash(FVector2D(tileData.GridPosition.X, tileData.GridPosition.Y));
+
+	if (Tiles.Contains(hash))
+	{
+		Tiles[hash] = tileData;
+		return true;
+	}
+
+	return false;
+}
 const FTileData& AGrid::GetTile(const FVector2D& gridPosition)
 {
 	FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
@@ -120,6 +173,15 @@ const TMap<FString, FTileData>& AGrid::GetAllTiles()
 	return Tiles;
 }
 
+void AGrid::FindPath(const FTileData& start, const FTileData& end)
+{
+
+}
+void AGrid::GetTilesInRange(const FTileData& origin, uint8 range)
+{
+
+}
+
 void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
@@ -131,13 +193,12 @@ void AGrid::BeginPlay()
 
 void AGrid::DetermineMeasurements()
 {
-	if (BPTileDecal)
-	{
-		ADecalActor* decalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
-		FVector decalSize = decalActor->GetDecal()->DecalSize;
-		OuterRadius = FMath::Max(decalSize.Y, decalSize.Z);
-		decalActor->Destroy();
-	}
+	check(IsValid(BPTileDecal) && "No TileDecal is set - it is needed to determine the positions of the tiles!");
+
+	ADecalActor* decalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
+	FVector decalSize = decalActor->GetDecal()->DecalSize;
+	OuterRadius = FMath::Max(decalSize.Y, decalSize.Z);
+	decalActor->Destroy();
 
 	VerticalSpacing = OuterRadius * 1.5f;
 	HorizontalSpacing = sqrtf(3.f) * OuterRadius;
@@ -146,48 +207,16 @@ void AGrid::DetermineMeasurements()
 	{
 		ALandscape *landscape = *ActorItr;
 
-		if (landscape)
-		{
-			FVector origin, extent;
-			landscape->GetActorBounds(false, origin, extent);
-			MinLandscapeBounds = origin - extent;
-			MaxLandscapeBounds = origin + extent;
-			AbsoluteLandscapeSize = MaxLandscapeBounds - MinLandscapeBounds;
-			HorizontalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.X / HorizontalSpacing);
-			VerticalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.Y / VerticalSpacing);
+		check(IsValid(landscape) && "No landscape is found in the level!");
 
-			break;
-		}
+		FVector origin, extent;
+		landscape->GetActorBounds(false, origin, extent);
+		MinLandscapeBounds = origin - extent;
+		MaxLandscapeBounds = origin + extent;
+		AbsoluteLandscapeSize = MaxLandscapeBounds - MinLandscapeBounds;
+		HorizontalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.X / HorizontalSpacing);
+		VerticalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.Y / VerticalSpacing);
+
+		break;
 	}
-}
-
-const FTileData& AGrid::AddTile(const FVector2D& gridPosition)
-{
-	FVector2D worldPosition = ConvertGridToWorld(gridPosition);
-
-	bool isNonWalkable = false;
-	bool hit = UStaticGridLibrary::IsWalkable(GetWorld(), FVector(worldPosition.X, worldPosition.Y, 0.f), LineTraceLength, isNonWalkable, WalkableObjects, NonWalkableObjects);
-	
-	FTileData tileData;
-	tileData.GridPosition = FVector(gridPosition.X, gridPosition.Y, -gridPosition.X - gridPosition.Y);
-	tileData.WorldPosition = FVector(worldPosition.X, worldPosition.Y, 0.f);
-
-	if (hit)
-	{
-		tileData.State = ETileState::Walkable;
-	}
-	else if (isNonWalkable)
-	{
-		tileData.State = ETileState::Obstructed;
-	}
-
-	
-	if (hit || isNonWalkable)
-	{
-		FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
-		Tiles.Add(hash, tileData);
-		return Tiles[hash];
-	}
-
-	return InvalidTile;
 }

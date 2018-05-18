@@ -72,6 +72,8 @@ AActor* const AObjectPool::GetObject()
 
 void AObjectPool::ReturnObject(AActor* const object)
 {
+	check(IsValid(object) && "AObjectPool::ReturnObject : Non valid pointer is given!");
+
 	int32 index;
 	if (InUseObjects.Find(object, index))
 	{

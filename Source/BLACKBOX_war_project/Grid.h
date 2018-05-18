@@ -2,9 +2,7 @@
 
 // TODO: Comments, Function Descriptions, Class Descriptions
 // TODO: Pathfinding
-// TODO: Tile Update Function, Tile Remove Function?
 // TODO: Default Walkable/NonWalkable/Raycast Length
-// TODO: Check pointers the right way
 
 #pragma once
 
@@ -35,13 +33,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	FVector2D ConvertWorldToGrid(const FVector2D&  worldPosition);
 
-	UFUNCTION(BlueprintCallable, Category = "Grid")
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	const FTileData& AddTile(const FVector2D& gridPosition);
-
-	UFUNCTION(BlueprintCallable, Category = "Grid")
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	bool RemoveTile(const FVector2D& gridPosition);
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	bool UpdateTile(const FTileData& tileData);
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	const FTileData& GetTile(const FVector2D& gridPosition);
-	UFUNCTION(BlueprintCallable, Category = "Grid")
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	const TMap<FString, FTileData>& GetAllTiles();
+
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	void FindPath(const FTileData& start, const FTileData& end);
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	void GetTilesInRange(const FTileData& origin, uint8 range);
 
 protected:
 	virtual void BeginPlay() override;

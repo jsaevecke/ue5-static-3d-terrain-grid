@@ -50,6 +50,8 @@ class BLACKBOX_WAR_PROJECT_API UStaticGridLibrary : public UObject
 {
 	GENERATED_BODY()
 
+	const static TArray<FVector> TileDirections;
+
 public:
 	UFUNCTION(BlueprintCallable, Category="Grid")
 	static FORCEINLINE bool IsValidTile(const FTileData& tileData)
