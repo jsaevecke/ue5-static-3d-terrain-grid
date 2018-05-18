@@ -2,8 +2,10 @@
 
 // TODO: Comments, Function Descriptions, Class Descriptions
 // TODO: Pathfinding
-// TODO: Tile Update Function
+// TODO: Tile Update Function, Tile Remove Function?
 // TODO: Default Walkable/NonWalkable/Raycast Length
+// TODO: Check pointers the right way
+
 #pragma once
 
 #include "CoreMinimal.h"
