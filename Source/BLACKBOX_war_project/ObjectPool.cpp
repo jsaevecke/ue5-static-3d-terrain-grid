@@ -16,6 +16,8 @@ void AObjectPool::BeginPlay()
 {
 	Super::BeginPlay();
 
+	this->SetFolderPath(PoolFolder);
+
 	ReserveObjects();
 }
 
@@ -33,6 +35,8 @@ AActor* const AObjectPool::CreateObject(bool isInUse)
 	{
 		AActor* object = GetWorld()->SpawnActor(ObjectToPool);
 		object->SetActorHiddenInGame(true);
+		object->SetFolderPath(ObjectFolder);
+
 		CurrentObjectCount = CurrentObjectCount + 1;
 
 		if (isInUse)

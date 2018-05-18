@@ -3,6 +3,7 @@
 // TODO: Comments, Function Descriptions, Class Descriptions
 // TODO: Pathfinding
 // TODO: Tile Update Function
+// TODO: Default Walkable/NonWalkable/Raycast Length
 #pragma once
 
 #include "CoreMinimal.h"
@@ -53,8 +54,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Config|Organisation")
 	FName GridFolder;
-	UPROPERTY(EditDefaultsOnly, Category = "Config|Organisation")
-	FName PoolFolder;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Config|Navigation")
 	TArray<TEnumAsByte<ECollisionChannel>> WalkableObjects;

@@ -21,8 +21,6 @@ AGrid::AGrid()
 
 	WorldToGridX = FVector2D(sqrt3 / 3.f, -1.f / 3.f);
 	WorldToGridY = FVector2D(0.f, 2.f / 3.f);
-
-	this->SetFolderPath(GridFolder);
 }
 AGrid::~AGrid()
 {
@@ -126,12 +124,13 @@ void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
 
+	this->SetFolderPath(GridFolder);
+
 	Spawn();
 }
 
 void AGrid::DetermineMeasurements()
 {
-	// TODO: ERROR HANDLING
 	if (BPTileDecal)
 	{
 		ADecalActor* decalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
@@ -147,7 +146,6 @@ void AGrid::DetermineMeasurements()
 	{
 		ALandscape *landscape = *ActorItr;
 
-		// TODO: ERROR HANDLING
 		if (landscape)
 		{
 			FVector origin, extent;
