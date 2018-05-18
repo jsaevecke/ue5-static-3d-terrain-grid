@@ -1,6 +1,8 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
 // TODO: Comments, Function Descriptions, Class Descriptions
+// TODO: Pathfinding
+// TODO: Tile Update Function
 #pragma once
 
 #include "CoreMinimal.h"
@@ -17,12 +19,13 @@ class BLACKBOX_WAR_PROJECT_API AGrid : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AGrid();
 	~AGrid();
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	void Spawn();
+	UFUNCTION(BlueprintCallable, Category = "Grid")
+	void Destroy();
 
 	UFUNCTION(BlueprintCallable, Category="Grid")
 	FVector2D ConvertGridToWorld(const FVector2D&  gridPosition);
@@ -42,13 +45,10 @@ protected:
 
 private:
 	UFUNCTION()
-	void Destroy();
-
-	UFUNCTION()
 	void DetermineMeasurements();
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Config|Graphics")
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
 	TSubclassOf<ADecalActor> BPTileDecal;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Config|Organisation")
@@ -64,9 +64,6 @@ public:
 	float LineTraceLength;
 
 private:
-	UPROPERTY()
-	AObjectPool* TilePool = nullptr;
-
 	UPROPERTY()
 	TMap<FString, FTileData> Tiles;
 	UPROPERTY()

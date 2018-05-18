@@ -54,6 +54,10 @@ void AGrid::Spawn()
 		}
 	}
 }
+void AGrid::Destroy()
+{
+	Tiles.Empty();
+}
 
 FVector2D AGrid::ConvertGridToWorld(const FVector2D& gridPosition)
 {
@@ -118,24 +122,11 @@ const TMap<FString, FTileData>& AGrid::GetAllTiles()
 	return Tiles;
 }
 
-// Called when the game starts or when spawned
 void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Spawn();
-}
-
-void AGrid::Destroy()
-{
-	Tiles.Empty();
-
-	if (TilePool)
-	{
-		TilePool->Empty();
-		TilePool->Destroy();
-	}
-
 }
 
 void AGrid::DetermineMeasurements()
