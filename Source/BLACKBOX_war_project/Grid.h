@@ -4,6 +4,12 @@
 // TODO: Pathfinding
 // TODO: Default Walkable/NonWalkable/Raycast Length
 // TODO: Variable naming convention (C++&Blueprint)
+// TODO: ETileState refactor
+// TODO : Path- Start and End cannot be placed on obstructed tiles
+// TODO : TArray works with references
+// TODO : Need Edge Information for pathfinding
+// TODO : A* instead of simple breadth search
+// TODO : Exclude Obstructed Tiles
 
 #pragma once
 
@@ -46,9 +52,11 @@ public:
 	const TMap<FString, FTileData>& GetAllTiles();
 
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& path);
+	void FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& outPath);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void GetTilesInRange(const FVector2D& origin, uint8 range, TArray<FTileData>& tiles);
+	void GetTilesInRange(const FVector2D& origin, uint8 range, TArray<FTileData>& outTiles);
+	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
+	void GetNeighbors(const FVector2D& origin, TArray<FTileData>& outNeighbors);
 
 protected:
 	virtual void BeginPlay() override;

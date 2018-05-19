@@ -121,12 +121,12 @@ const FTileData& AGrid::AddTile(const FVector2D& gridPosition)
 		tileData.State = ETileState::Obstructed;
 	}
 
-
 	if (hit || isNonWalkable)
 	{
 		FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
-		Tiles.Add(hash, tileData);
-		return Tiles[hash];
+		tileData.Hash = hash;
+		Tiles.Add(tileData.Hash, tileData);
+		return Tiles[tileData.Hash];
 	}
 
 	return InvalidTile;
@@ -173,13 +173,45 @@ const TMap<FString, FTileData>& AGrid::GetAllTiles()
 	return Tiles;
 }
 
-void AGrid::FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& pathOUT)
+void AGrid::FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& outPath)
 {
+	TArray<FTileData> frontier;
+	frontier.Add(start);
 
+	TMap<FString, FTileData> from;
+	from.Add(start.Hash, FTileData());
+
+	while (frontier.Num() > 0)
+	{
+		FTileData current = frontier[0];
+		frontier.RemoveAt(0);
+
+		if (current.Hash.Equals(end.Hash))
+		{
+			FTileData& parent = from[current.Hash];
+			while (parent.State != ETileState::NotValid)
+			{
+				outPath.Add(parent);
+				parent = from[parent.Hash];
+			}
+			return;
+		}
+
+		TArray<FTileData> neighbors;
+		GetNeighbors(FVector2D(current.GridPosition), neighbors);
+
+		for (auto& neighbor : neighbors)
+		{
+			if (!from.Contains(neighbor.Hash) && neighbor.State == ETileState::Walkable)
+			{
+				frontier.Add(neighbor);
+				from.Add(neighbor.Hash, current);
+			}
+		}
+	}
 }
-
 // TODO: Think about returning just Vectors instead of whole FTileData structs?
-void AGrid::GetTilesInRange(const FVector2D& origin, const uint8 range, TArray<FTileData>& tilesOUT)
+void AGrid::GetTilesInRange(const FVector2D& origin, const uint8 range, TArray<FTileData>& outTiles)
 {
 	for (int16 column = -range; column <= range; ++column)
 	{
@@ -191,8 +223,22 @@ void AGrid::GetTilesInRange(const FVector2D& origin, const uint8 range, TArray<F
 			
 			if (tileData != nullptr)
 			{
-				tilesOUT.Add(*tileData);
+				outTiles.Add(*tileData);
 			}
+		}
+	}
+}
+void AGrid::GetNeighbors(const FVector2D& origin, TArray<FTileData>& outNeighbors)
+{
+	for (auto direction : UStaticGridLibrary::TileDirections)
+	{
+		FString hash = UStaticGridLibrary::GetTileHash(origin + FVector2D(direction));
+
+		FTileData* neighbor = Tiles.Find(hash);
+
+		if (neighbor != nullptr)
+		{
+			outNeighbors.Add(*neighbor);
 		}
 	}
 }

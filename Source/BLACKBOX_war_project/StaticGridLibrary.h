@@ -28,13 +28,17 @@ struct FTileNavData
 {
 	GENERATED_BODY()
 
+	FTileData* parent;
+
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Nav")
 	float GCost;
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Nav")
 	float HCost;
+	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Nav")
+	float FCost;
 
 	FTileNavData() 
-		: GCost(std::numeric_limits<float>::max()), HCost(std::numeric_limits<float>::max())
+		: parent(nullptr), GCost(0.f), HCost(0.f), FCost(0.f)
 	{
 	}
 };
@@ -52,9 +56,11 @@ struct FTileData
 	ETileState State;
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Data")
 	FTileNavData NavData;
+	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Data")
+	FString Hash;
 
 	FTileData()
-		: GridPosition(0.f, 0.f, 0.f), WorldPosition(0.f, 0.f, 0.f), State(ETileState::NotValid), NavData()
+		: GridPosition(0.f, 0.f, 0.f), WorldPosition(0.f, 0.f, 0.f), State(ETileState::NotValid), NavData(), Hash("0_0")
 	{
 
 	}
@@ -67,10 +73,9 @@ UCLASS()
 class BLACKBOX_WAR_PROJECT_API UStaticGridLibrary : public UObject
 {
 	GENERATED_BODY()
-
+public:
 	const static TArray<FVector> TileDirections;
 
-public:
 	UFUNCTION(BlueprintCallable, Category="Grid")
 	static FORCEINLINE bool IsValidTile(const FTileData& tileData)
 	{
