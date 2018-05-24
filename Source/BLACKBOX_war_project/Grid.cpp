@@ -13,12 +13,12 @@ AGrid::AGrid()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
-	float sqrt3 = sqrtf(3.f);
+	float Sqrt3 = FMath::Sqrt(3.f);
 
-	GridToWorldX = FVector2D(sqrt3, sqrt3 / 2.f);
+	GridToWorldX = FVector2D(Sqrt3, Sqrt3 / 2.f);
 	GridToWorldY = FVector2D(0.f, 3.f / 2.f);
 
-	WorldToGridX = FVector2D(sqrt3 / 3.f, -1.f / 3.f);
+	WorldToGridX = FVector2D(Sqrt3 / 3.f, -1.f / 3.f);
 	WorldToGridY = FVector2D(0.f, 2.f / 3.f);
 }
 AGrid::~AGrid()
@@ -32,22 +32,22 @@ void AGrid::Spawn()
 
 	DetermineMeasurements();
 
-	for (int32 row = 1; row < VerticalTileCount; ++row)
+	for (int32 Row = 1; Row < VerticalTileCount; ++Row)
 	{
-		FVector2D indices = UStaticGridLibrary::CalculateOffsetIndices(row, HorizontalTileCount);
+		FVector2D Indices = UStaticGridLibrary::CalculateOffsetIndices(Row, HorizontalTileCount);
 
-		if (row % 2 == 0)
+		if (Row % 2 == 0)
 		{
-			indices.X = indices.X + 1;
+			Indices.X = Indices.X + 1;
 		}
 		else
 		{
-			indices.Y = indices.Y - 1;
+			Indices.Y = Indices.Y - 1;
 		}
 
-		for (int32 column = indices.X; column < indices.Y; ++column)
+		for (int32 Column = Indices.X; Column < Indices.Y; ++Column)
 		{
-			AddTile(FVector2D(column, row));
+			AddTile(FVector2D(Column, Row));
 		}
 	}
 }
@@ -56,114 +56,114 @@ void AGrid::Destroy()
 	Tiles.Empty();
 }
 
-FVector2D AGrid::ConvertGridToWorld(const FVector2D& gridPosition)
+FVector2D AGrid::ConvertGridToWorld(const FVector2D& GridPosition)
 {
-	FVector2D offset = FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y);
+	FVector2D Offset = FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y);
 
-	FVector2D x = GridToWorldX * gridPosition;
-	FVector2D y = GridToWorldY * gridPosition;
+	FVector2D X = GridToWorldX * GridPosition;
+	FVector2D Y = GridToWorldY * GridPosition;
 
-	return offset + FVector2D(x.X + x.Y, y.X + y.Y) * OuterRadius;
+	return Offset + FVector2D(X.X + X.Y, Y.X + Y.Y) * OuterRadius;
 }
-FVector2D AGrid::ConvertWorldToGrid(const FVector2D& worldPosition)
+FVector2D AGrid::ConvertWorldToGrid(const FVector2D& WorldPosition)
 {
-	FVector2D offset = FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y);
-	FVector2D offsetWorldPosition = worldPosition - offset;
+	FVector2D Offset = FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y);
+	FVector2D OffsetWorldPosition = WorldPosition - Offset;
 
-	FVector2D x = WorldToGridX * offsetWorldPosition;
-	FVector2D y = WorldToGridY * offsetWorldPosition;
+	FVector2D X = WorldToGridX * OffsetWorldPosition;
+	FVector2D Y = WorldToGridY * OffsetWorldPosition;
 
-	FVector2D gridPosition = FVector2D(x.X + x.Y, y.X + y.Y);
+	FVector2D GridPosition = FVector2D(X.X + X.Y, Y.X + Y.Y);
 
-	gridPosition = gridPosition / OuterRadius;
+	GridPosition = GridPosition / OuterRadius;
 
-	FVector fractional = FVector(gridPosition.X, gridPosition.Y, -gridPosition.X - gridPosition.Y);
-	FVector rounded = FVector(FMath::RoundToInt(fractional.X), FMath::RoundToInt(fractional.Y), FMath::RoundToInt(fractional.Z));
-	FVector diff = fractional - rounded;
+	FVector Fractional = FVector(GridPosition.X, GridPosition.Y, -GridPosition.X - GridPosition.Y);
+	FVector Rounded = FVector(FMath::RoundToInt(Fractional.X), FMath::RoundToInt(Fractional.Y), FMath::RoundToInt(Fractional.Z));
+	FVector Diff = Fractional - Rounded;
 
-	diff.X = FMath::Abs(diff.X);
-	diff.Y = FMath::Abs(diff.Y);
-	diff.Z = FMath::Abs(diff.Z);
+	Diff.X = FMath::Abs(Diff.X);
+	Diff.Y = FMath::Abs(Diff.Y);
+	Diff.Z = FMath::Abs(Diff.Z);
 
-	if (diff.X > diff.Y && diff.X > diff.Z)
+	if (Diff.X > Diff.Y && Diff.X > Diff.Z)
 	{
-		rounded.X = -rounded.Y - rounded.Z;
+		Rounded.X = -Rounded.Y - Rounded.Z;
 	}
-	else if (diff.Y > diff.Z)
+	else if (Diff.Y > Diff.Z)
 	{
-		rounded.Y = -rounded.X - rounded.Z;
+		Rounded.Y = -Rounded.X - Rounded.Z;
 	}
 	else
 	{
-		rounded.Z = -rounded.X - rounded.Y;
+		Rounded.Z = -Rounded.X - Rounded.Y;
 	}
 
-	return FVector2D(rounded.X, rounded.Y);
+	return FVector2D(Rounded.X, Rounded.Y);
 }
 
-const FTileData& AGrid::AddTile(const FVector2D& gridPosition)
+const FTileData& AGrid::AddTile(const FVector2D& GridPosition)
 {
-	FVector2D worldPosition = ConvertGridToWorld(gridPosition);
+	FVector2D WorldPosition = ConvertGridToWorld(GridPosition);
 
-	bool isNonWalkable = false;
-	bool hit = UStaticGridLibrary::IsWalkable(GetWorld(), FVector(worldPosition.X, worldPosition.Y, 0.f), LineTraceLength, isNonWalkable, WalkableObjects, NonWalkableObjects);
+	bool bNonWalkable = false;
+	bool bHit = UStaticGridLibrary::IsWalkable(GetWorld(), FVector(WorldPosition.X, WorldPosition.Y, 0.f), LineTraceLength, bNonWalkable, WalkableObjects, NonWalkableObjects);
 
-	FTileData tileData;
-	tileData.GridPosition = FVector(gridPosition.X, gridPosition.Y, -gridPosition.X - gridPosition.Y);
-	tileData.WorldPosition = FVector(worldPosition.X, worldPosition.Y, 0.f);
+	FTileData TileData;
+	TileData.GridPosition = FVector(GridPosition.X, GridPosition.Y, -GridPosition.X - GridPosition.Y);
+	TileData.WorldPosition = FVector(WorldPosition.X, WorldPosition.Y, 0.f);
 
-	if (hit)
+	if (bHit)
 	{
-		tileData.State = ETileState::Walkable;
+		TileData.State = ETileState::Walkable;
 	}
-	else if (isNonWalkable)
+	else if (bNonWalkable)
 	{
-		tileData.State = ETileState::Obstructed;
+		TileData.State = ETileState::Obstructed;
 	}
 
-	if (hit || isNonWalkable)
+	if (bHit || bNonWalkable)
 	{
-		FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
-		tileData.Hash = hash;
-		Tiles.Add(tileData.Hash, tileData);
-		return Tiles[tileData.Hash];
+		FString Hash = UStaticGridLibrary::GetTileHash(GridPosition);
+		TileData.Hash = Hash;
+		Tiles.Add(TileData.Hash, TileData);
+		return Tiles[TileData.Hash];
 	}
 
 	return InvalidTile;
 }
-bool AGrid::RemoveTile(const FVector2D& gridPosition)
+bool AGrid::RemoveTile(const FVector2D& GridPosition)
 {
-	FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
+	FString Hash = UStaticGridLibrary::GetTileHash(GridPosition);
 
-	if (Tiles.Contains(hash))
+	if (Tiles.Contains(Hash))
 	{
-		Tiles.Remove(hash);
+		Tiles.Remove(Hash);
 		return true;
 	}
 
 	return false;
 }
-bool AGrid::UpdateTile(const FTileData& tileData)
+bool AGrid::UpdateTile(const FTileData& TileData)
 {
-	FString hash = UStaticGridLibrary::GetTileHash(FVector2D(tileData.GridPosition.X, tileData.GridPosition.Y));
+	FString Hash = UStaticGridLibrary::GetTileHash(FVector2D(TileData.GridPosition.X, TileData.GridPosition.Y));
 
-	if (Tiles.Contains(hash))
+	if (Tiles.Contains(Hash))
 	{
-		Tiles[hash] = tileData;
+		Tiles[Hash] = TileData;
 		return true;
 	}
 
 	return false;
 }
-const FTileData& AGrid::GetTile(const FVector2D& gridPosition)
+const FTileData& AGrid::GetTile(const FVector2D& GridPosition)
 {
-	FString hash = UStaticGridLibrary::GetTileHash(gridPosition);
+	FString Hash = UStaticGridLibrary::GetTileHash(GridPosition);
 
-	FTileData* tileData = Tiles.Find(hash);
+	FTileData* TileData = Tiles.Find(Hash);
 
-	if (tileData)
+	if (TileData)
 	{
-		return *tileData;
+		return *TileData;
 	}
 
 	return InvalidTile;
@@ -173,72 +173,72 @@ const TMap<FString, FTileData>& AGrid::GetAllTiles()
 	return Tiles;
 }
 
-void AGrid::FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& outPath)
+void AGrid::FindPath(const FTileData& Start, const FTileData& End, TArray<FTileData>& outPath)
 {
-	TArray<FTileData> frontier;
-	frontier.Add(start);
+	TArray<FTileData> Frontier;
+	Frontier.Add(Start);
 
-	TMap<FString, FTileData> from;
-	from.Add(start.Hash, FTileData());
+	TMap<FString, FTileData> From;
+	From.Add(Start.Hash, FTileData());
 
-	while (frontier.Num() > 0)
+	while (Frontier.Num() > 0)
 	{
-		FTileData current = frontier[0];
-		frontier.RemoveAt(0);
+		FTileData Current = Frontier[0];
+		Frontier.RemoveAt(0);
 
-		if (current.Hash.Equals(end.Hash))
+		if (Current.Hash.Equals(End.Hash))
 		{
-			FTileData& parent = from[current.Hash];
-			while (parent.State != ETileState::NotValid)
+			FTileData& Parent = From[Current.Hash];
+			while (Parent.State != ETileState::NotValid)
 			{
-				outPath.Add(parent);
-				parent = from[parent.Hash];
+				outPath.Add(Parent);
+				Parent = From[Parent.Hash];
 			}
 			return;
 		}
 
-		TArray<FTileData> neighbors;
-		GetNeighbors(FVector2D(current.GridPosition), neighbors);
+		TArray<FTileData> Neighbors;
+		GetNeighbors(FVector2D(Current.GridPosition), Neighbors);
 
-		for (auto& neighbor : neighbors)
+		for (auto& Neighbor : Neighbors)
 		{
-			if (!from.Contains(neighbor.Hash) && neighbor.State == ETileState::Walkable)
+			if (!From.Contains(Neighbor.Hash) && Neighbor.State == ETileState::Walkable)
 			{
-				frontier.Add(neighbor);
-				from.Add(neighbor.Hash, current);
+				Frontier.Add(Neighbor);
+				From.Add(Neighbor.Hash, Current);
 			}
 		}
 	}
 }
 // TODO: Think about returning just Vectors instead of whole FTileData structs?
-void AGrid::GetTilesInRange(const FVector2D& origin, const uint8 range, TArray<FTileData>& outTiles)
+void AGrid::GetTilesInRange(const FVector2D& Origin, const uint8 Range, TArray<FTileData>& outTiles)
 {
-	for (int16 column = -range; column <= range; ++column)
+	for (int16 Column = -Range; Column <= Range; ++Column)
 	{
-		for (int16 row = FMath::Max<int16>(-range, -column-range); row <= FMath::Min<int16>(range, -column+range); ++row)
+		for (int16 Row = FMath::Max<int16>(-Range, -Column-Range); Row <= FMath::Min<int16>(Range, -Column+Range); ++Row)
 		{
-			FString hash = UStaticGridLibrary::GetTileHash(origin + FVector2D(column, row));
+			FString Hash = UStaticGridLibrary::GetTileHash(Origin + FVector2D(Column, Row));
 
-			FTileData* tileData = Tiles.Find(hash);
+			FTileData* TileData = Tiles.Find(Hash);
 			
-			if (tileData != nullptr)
+			if (TileData != nullptr)
 			{
-				outTiles.Add(*tileData);
+				outTiles.Add(*TileData);
 			}
 		}
 	}
 }
-void AGrid::GetNeighbors(const FVector2D& origin, TArray<FTileData>& outNeighbors)
+void AGrid::GetNeighbors(const FVector2D& Origin, TArray<FTileData>& outNeighbors)
 {
 	for (auto direction : UStaticGridLibrary::TileDirections)
 	{
-		FString hash = UStaticGridLibrary::GetTileHash(origin + FVector2D(direction));
+		FString Hash = UStaticGridLibrary::GetTileHash(Origin + FVector2D(direction));
 
-		FTileData* neighbor = Tiles.Find(hash);
+		FTileData* Neighbor = Tiles.Find(Hash);
 
-		if (neighbor != nullptr)
+		if (Neighbor != nullptr)
 		{
-			outNeighbors.Add(*neighbor);
+			outNeighbors.Add(*Neighbor);
 		}
 	}
 }
@@ -256,24 +256,24 @@ void AGrid::DetermineMeasurements()
 {
 	check(IsValid(BPTileDecal) && "No TileDecal is set - it is needed to determine the positions of the tiles!");
 
-	ADecalActor* decalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
-	FVector decalSize = decalActor->GetDecal()->DecalSize;
-	OuterRadius = FMath::Max(decalSize.Y, decalSize.Z);
-	decalActor->Destroy();
+	ADecalActor* DecalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
+	FVector DecalSize = DecalActor->GetDecal()->DecalSize;
+	OuterRadius = FMath::Max(DecalSize.Y, DecalSize.Z);
+	DecalActor->Destroy();
 
 	VerticalSpacing = OuterRadius * 1.5f;
-	HorizontalSpacing = sqrtf(3.f) * OuterRadius;
+	HorizontalSpacing = FMath::Sqrt(3.f) * OuterRadius;
 
 	for (TActorIterator<ALandscape> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-		ALandscape *landscape = *ActorItr;
+		ALandscape *Landscape = *ActorItr;
 
-		check(IsValid(landscape) && "No landscape is found in the level!");
+		check(IsValid(Landscape) && "No Landscape is found in the level!");
 
-		FVector origin, extent;
-		landscape->GetActorBounds(false, origin, extent);
-		MinLandscapeBounds = origin - extent;
-		MaxLandscapeBounds = origin + extent;
+		FVector Origin, Extent;
+		Landscape->GetActorBounds(false, Origin, Extent);
+		MinLandscapeBounds = Origin - Extent;
+		MaxLandscapeBounds = Origin + Extent;
 		AbsoluteLandscapeSize = MaxLandscapeBounds - MinLandscapeBounds;
 		HorizontalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.X / HorizontalSpacing);
 		VerticalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.Y / VerticalSpacing);

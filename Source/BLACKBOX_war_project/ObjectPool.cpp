@@ -23,32 +23,32 @@ void AObjectPool::BeginPlay()
 
 void AObjectPool::ReserveObjects()
 {
-	for (uint8 count = 0; count < ReserveObjectCount; ++count)
+	for (uint8 Count = 0; Count < ReserveObjectCount; ++Count)
 	{
 		CreateObject(false);
 	}
 }
 
-AActor* const AObjectPool::CreateObject(bool isInUse)
+AActor* const AObjectPool::CreateObject(bool bInUse)
 {
 	if (ObjectToPool && (CurrentObjectCount < MaxObjectCount || MaxObjectCount == 0))
 	{
-		AActor* object = GetWorld()->SpawnActor(ObjectToPool);
-		object->SetActorHiddenInGame(true);
-		object->SetFolderPath(ObjectFolder);
+		AActor* Object = GetWorld()->SpawnActor(ObjectToPool);
+		Object->SetActorHiddenInGame(true);
+		Object->SetFolderPath(ObjectFolder);
 
 		CurrentObjectCount = CurrentObjectCount + 1;
 
-		if (isInUse)
+		if (bInUse)
 		{
-			InUseObjects.Add(object);
+			InUseObjects.Add(Object);
 		}
 		else
 		{
-			NotInUseObjects.Add(object);
+			NotInUseObjects.Add(Object);
 		}
 
-		return object;
+		return Object;
 	}
 
 	return nullptr;
@@ -58,11 +58,11 @@ AActor* const AObjectPool::GetObject()
 {
 	if (NotInUseObjects.Num() > 0)
 	{
-		AActor* const object = NotInUseObjects.Pop();
+		AActor* const Object = NotInUseObjects.Pop();
 
-		InUseObjects.Add(object);
+		InUseObjects.Add(Object);
 
-		return object;
+		return Object;
 	}
 	else
 	{
@@ -70,15 +70,15 @@ AActor* const AObjectPool::GetObject()
 	}
 }
 
-void AObjectPool::ReturnObject(AActor* const object)
+void AObjectPool::ReturnObject(AActor* const Object)
 {
-	check(IsValid(object) && "AObjectPool::ReturnObject : Non valid pointer is given!");
+	check(IsValid(Object) && "AObjectPool::ReturnObject : Non valid pointer is given!");
 
-	int32 index;
-	if (InUseObjects.Find(object, index))
+	int32 Index;
+	if (InUseObjects.Find(Object, Index))
 	{
-		InUseObjects.Remove(object);
-		NotInUseObjects.Add(object);
+		InUseObjects.Remove(Object);
+		NotInUseObjects.Add(Object);
 	}
 }
 
@@ -86,16 +86,16 @@ void AObjectPool::Empty()
 {
 	CurrentObjectCount = 0;
 
-	for (auto& object : NotInUseObjects)
+	for (auto& Object : NotInUseObjects)
 	{
-		object->Destroy();
+		Object->Destroy();
 	}
 
 	NotInUseObjects.Empty();
 
-	for (auto& object : InUseObjects)
+	for (auto& Object : InUseObjects)
 	{
-		object->Destroy();
+		Object->Destroy();
 	}
 
 	InUseObjects.Empty();

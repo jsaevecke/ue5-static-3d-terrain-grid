@@ -5,43 +5,43 @@
 
 const TArray<FVector> UStaticGridLibrary::TileDirections = { FVector(1, 0, -1), FVector(1, -1, 0), FVector(0, -1, 1), FVector(-1, 0, 1), FVector(-1, 1, 0), FVector(0, 1, -1) };
 
-bool UStaticGridLibrary::IsWalkable(UWorld* const world, const FVector& worldPosition, float lineTraceLength, bool& isNonWalkable, TArray<TEnumAsByte<ECollisionChannel>> walkableObjects, TArray<TEnumAsByte<ECollisionChannel>> nonWalkableObjects)
+bool UStaticGridLibrary::IsWalkable(UWorld* const World, const FVector& WorldPosition, float LineTraceLength, bool& bNonWalkable, TArray<TEnumAsByte<ECollisionChannel>> WalkableObjects, TArray<TEnumAsByte<ECollisionChannel>> NonWalkableObjects)
 {
-	check(IsValid(world) && "Non valid world pointer - without a world checking positions whether they are walkable is not possble!");
+	check(IsValid(World) && "Non valid World pointer - without a World checking positions whether they are walkable is not possble!");
 
-	TArray<TEnumAsByte<ECollisionChannel>> objectsToCheck = TArray<TEnumAsByte<ECollisionChannel>>();
-	objectsToCheck.Append(walkableObjects);
-	objectsToCheck.Append(nonWalkableObjects);
+	TArray<TEnumAsByte<ECollisionChannel>> ObjectsToCheck = TArray<TEnumAsByte<ECollisionChannel>>();
+	ObjectsToCheck.Append(WalkableObjects);
+	ObjectsToCheck.Append(NonWalkableObjects);
 
-	FVector start = FVector::UpVector  * lineTraceLength / 2.f + worldPosition;
-	FVector end = (-1) * FVector::UpVector * lineTraceLength + start;
+	FVector Start = FVector::UpVector  * LineTraceLength / 2.f + WorldPosition;
+	FVector End = (-1) * FVector::UpVector * LineTraceLength + Start;
 
-	FCollisionObjectQueryParams objectParams;
-	for (auto collisionChannel : objectsToCheck)
+	FCollisionObjectQueryParams ObjectParams;
+	for (auto CollisionChannel : ObjectsToCheck)
 	{
-		objectParams.AddObjectTypesToQuery(collisionChannel);
+		ObjectParams.AddObjectTypesToQuery(CollisionChannel);
 	}
 
 	const FName TraceTag("MyTraceTag");
 
-	world->DebugDrawTraceTag = TraceTag;
+	World->DebugDrawTraceTag = TraceTag;
 
-	FCollisionQueryParams params;
-	params.TraceTag = TraceTag;
+	FCollisionQueryParams Params;
+	Params.TraceTag = TraceTag;
 
-	FHitResult hitResult;
-	if (world->LineTraceSingleByObjectType(hitResult, start, end, objectParams, params))
+	FHitResult HitResult;
+	if (World->LineTraceSingleByObjectType(HitResult, Start, End, ObjectParams, Params))
 	{
-		TEnumAsByte<ECollisionChannel> collisionChannel = hitResult.Component->GetCollisionObjectType();
+		TEnumAsByte<ECollisionChannel> CollisionChannel = HitResult.Component->GetCollisionObjectType();
 
-		int32 isWalkable = walkableObjects.Find(collisionChannel);
-		if (isWalkable != INDEX_NONE)
+		int32 WalkableIndex = WalkableObjects.Find(CollisionChannel);
+		if (WalkableIndex != INDEX_NONE)
 		{
-			isNonWalkable = false;
+			bNonWalkable = false;
 			return true;
 		}
 
-		isNonWalkable = true;
+		bNonWalkable = true;
 		return false;
 	}
 

@@ -18,7 +18,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ObjectPool")
 	AActor* const GetObject();
 	UFUNCTION(BlueprintCallable, Category = "ObjectPool")
-	void ReturnObject(AActor* const object);
+	void ReturnObject(AActor* const Object);
 	UFUNCTION(BlueprintCallable, Category = "ObjectPool")
 	void Empty();
 
@@ -30,7 +30,7 @@ private:
 	UFUNCTION()
 	void ReserveObjects();
 	UFUNCTION()
-	AActor* const CreateObject(bool isInUse);
+	AActor* const CreateObject(bool bInUse);
 
 public:		
 	UPROPERTY(EditDefaultsOnly, Category = "Config")

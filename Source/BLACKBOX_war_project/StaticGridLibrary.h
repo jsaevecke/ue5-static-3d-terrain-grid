@@ -28,7 +28,7 @@ struct FTileNavData
 {
 	GENERATED_BODY()
 
-	FTileData* parent;
+	FTileData* Parent;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Grid|Tile|Nav")
 	float GCost;
@@ -38,7 +38,7 @@ struct FTileNavData
 	float FCost;
 
 	FTileNavData() 
-		: parent(nullptr), GCost(0.f), HCost(0.f), FCost(0.f)
+		: Parent(nullptr), GCost(0.f), HCost(0.f), FCost(0.f)
 	{
 	}
 };
@@ -77,25 +77,25 @@ public:
 	const static TArray<FVector> TileDirections;
 
 	UFUNCTION(BlueprintCallable, Category="Grid")
-	static FORCEINLINE bool IsValidTile(const FTileData& tileData)
+	static FORCEINLINE bool IsValidTile(const FTileData& TileData)
 	{
-		return !(tileData.State == ETileState::NotValid);
+		return !(TileData.State == ETileState::NotValid);
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static FORCEINLINE FVector2D CalculateOffsetIndices(int32 row, int32 width)
+	static FORCEINLINE FVector2D CalculateOffsetIndices(int32 Row, int32 Width)
 	{
-		int32 x = FMath::FloorToInt(row / 2.f);
-		int32 y = width - x;
+		int32 x = FMath::FloorToInt(Row / 2.f);
+		int32 y = Width - x;
 		return FVector2D(x * (-1), y);
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static FORCEINLINE FString GetTileHash(const FVector2D& gridPosition)
+	static FORCEINLINE FString GetTileHash(const FVector2D& GridPosition)
 	{
-		return FString::FromInt(static_cast<int>(gridPosition.X)) + "_" + FString::FromInt(static_cast<int>(gridPosition.Y));
+		return FString::FromInt(static_cast<int>(GridPosition.X)) + "_" + FString::FromInt(static_cast<int>(GridPosition.Y));
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static bool IsWalkable(UWorld* const world, const FVector& worldPosition, float lineTraceLength, bool& isNonWalkable, TArray<TEnumAsByte<ECollisionChannel>> walkableObjects, TArray<TEnumAsByte<ECollisionChannel>> nonWalkableObjects);
+	static bool IsWalkable(UWorld* const World, const FVector& WorldPosition, float LineTraceLength, bool& bNonWalkable, TArray<TEnumAsByte<ECollisionChannel>> WalkableObjects, TArray<TEnumAsByte<ECollisionChannel>> NonWalkableObjects);
 };

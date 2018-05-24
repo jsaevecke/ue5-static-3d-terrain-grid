@@ -1,15 +1,17 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
-// TODO: Comments, Function Descriptions, Class Descriptions
-// TODO: Pathfinding
-// TODO: Default Walkable/NonWalkable/Raycast Length
-// TODO: Variable naming convention (C++&Blueprint)
-// TODO: ETileState refactor
+// TODO : Comments, Function Descriptions, Class Descriptions
+// TODO : Default Walkable/NonWalkable/Raycast Length
+// TODO : Variable naming convention (C++&Blueprint)
+// TODO : ETileState refactor
 // TODO : Path- Start and End cannot be placed on obstructed tiles
 // TODO : TArray works with references
-// TODO : Need Edge Information for pathfinding
+// TODO : Need Edge Information for pathfinding or more raycasts?
 // TODO : A* instead of simple breadth search
+// TODO : Dynamic A*
 // TODO : Exclude Obstructed Tiles
+// TODO : Multiplayer
+// TODO : Smartphone/Tablet Support
 
 #pragma once
 
@@ -36,27 +38,27 @@ public:
 	void Destroy();
 
 	UFUNCTION(BlueprintCallable, Category="Grid")
-	FVector2D ConvertGridToWorld(const FVector2D&  gridPosition);
+	FVector2D ConvertGridToWorld(const FVector2D&  GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid")
-	FVector2D ConvertWorldToGrid(const FVector2D&  worldPosition);
+	FVector2D ConvertWorldToGrid(const FVector2D&  WorldPosition);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	const FTileData& AddTile(const FVector2D& gridPosition);
+	const FTileData& AddTile(const FVector2D& GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	bool RemoveTile(const FVector2D& gridPosition);
+	bool RemoveTile(const FVector2D& GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	bool UpdateTile(const FTileData& tileData);
+	bool UpdateTile(const FTileData& TileData);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	const FTileData& GetTile(const FVector2D& gridPosition);
+	const FTileData& GetTile(const FVector2D& GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	const TMap<FString, FTileData>& GetAllTiles();
 
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void FindPath(const FTileData& start, const FTileData& end, TArray<FTileData>& outPath);
+	void FindPath(const FTileData& Start, const FTileData& End, TArray<FTileData>& outPath);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void GetTilesInRange(const FVector2D& origin, uint8 range, TArray<FTileData>& outTiles);
+	void GetTilesInRange(const FVector2D& Origin, uint8 Range, TArray<FTileData>& outTiles);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void GetNeighbors(const FVector2D& origin, TArray<FTileData>& outNeighbors);
+	void GetNeighbors(const FVector2D& Origin, TArray<FTileData>& outNeighbors);
 
 protected:
 	virtual void BeginPlay() override;
