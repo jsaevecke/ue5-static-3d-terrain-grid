@@ -1,18 +1,16 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
 // TODO : Comments, Function Descriptions, Class Descriptions
-// TODO : Default Walkable/NonWalkable/Raycast Length
-// TODO : Variable naming convention (C++&Blueprint)
 // TODO : ETileState refactor
 // TODO : Path- Start and End cannot be placed on obstructed tiles
-// TODO : TArray works with references
 // TODO : Need Edge Information for pathfinding or more raycasts?
-// TODO : A* instead of simple breadth search
-// TODO : Dynamic A*
 // TODO : Exclude Obstructed Tiles
 // TODO : Multiplayer
-// TODO : Smartphone/Tablet Support
 // TODO : Camera
+// Priority: Unimportant right now
+// TODO : A* instead of simple breadth search
+// TODO : Dynamic A*
+// TODO : Smartphone/Tablet Support
 
 #pragma once
 
