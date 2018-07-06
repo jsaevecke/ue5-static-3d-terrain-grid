@@ -9,32 +9,32 @@ bool UStaticGridLibrary::IsWalkable(UWorld* const World, const FVector& WorldPos
 {
 	check(IsValid(World) && "Non valid World pointer - without a World checking positions whether they are walkable is not possble!");
 
-	TArray<TEnumAsByte<ECollisionChannel>> ObjectsToCheck{ TArray<TEnumAsByte<ECollisionChannel>>{} };
+	auto ObjectsToCheck = TArray<TEnumAsByte<ECollisionChannel>>{};
 	ObjectsToCheck.Append(WalkableObjects);
 	ObjectsToCheck.Append(NonWalkableObjects);
 
-	FVector Start{ FVector::UpVector  * LineTraceLength / 2.f + WorldPosition };
-	FVector End{ (-1) * FVector::UpVector * LineTraceLength + Start };
+	auto Start = FVector::UpVector  * LineTraceLength / 2.f + WorldPosition;
+	auto End = (-1) * FVector::UpVector * LineTraceLength + Start;
 
-	FCollisionObjectQueryParams ObjectParams{};
+	auto ObjectParams = FCollisionObjectQueryParams{};
 	for (auto CollisionChannel : ObjectsToCheck)
 	{
 		ObjectParams.AddObjectTypesToQuery(CollisionChannel);
 	}
 
-	const FName TraceTag{ "MyTraceTag" };
+	const auto TraceTag = FName{ "MyTraceTag" };
 
 	World->DebugDrawTraceTag = TraceTag;
 
-	FCollisionQueryParams Params{};
+	auto Params = FCollisionQueryParams{};
 	Params.TraceTag = TraceTag;
 
-	FHitResult HitResult{};
+	auto HitResult = FHitResult{};
 	if (World->LineTraceSingleByObjectType(HitResult, Start, End, ObjectParams, Params))
 	{
-		TEnumAsByte<ECollisionChannel> CollisionChannel{ HitResult.Component->GetCollisionObjectType() };
+		auto CollisionChannel = TEnumAsByte<ECollisionChannel>{ HitResult.Component->GetCollisionObjectType() };
 
-		int32 WalkableIndex{ WalkableObjects.Find(CollisionChannel) };
+		auto WalkableIndex = int32{ WalkableObjects.Find(CollisionChannel) };
 		if (WalkableIndex != INDEX_NONE)
 		{
 			bNonWalkable = false;

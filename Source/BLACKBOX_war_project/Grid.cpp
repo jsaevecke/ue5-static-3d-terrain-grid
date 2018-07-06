@@ -13,7 +13,8 @@ AGrid::AGrid()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
-	float Sqrt3{ FMath::Sqrt(3.f) };
+	// Todo: 
+	auto Sqrt3 = FMath::Sqrt(3.f);
 
 	GridToWorldX =  FVector2D(Sqrt3, Sqrt3 / 2.f);
 	GridToWorldY = FVector2D(0.f, 3.f / 2.f);
@@ -32,9 +33,9 @@ void AGrid::Spawn()
 
 	DetermineMeasurements();
 
-	for (int32 Row{ 1 }; Row < VerticalTileCount; ++Row)
+	for (auto Row = int32{ 1 }; Row < VerticalTileCount; ++Row)
 	{
-		FVector2D Indices{ UStaticGridLibrary::CalculateOffsetIndices(Row, HorizontalTileCount) };
+		auto Indices = UStaticGridLibrary::CalculateOffsetIndices(Row, HorizontalTileCount);
 
 		if (Row % 2 == 0)
 		{
@@ -45,7 +46,7 @@ void AGrid::Spawn()
 			Indices.Y = Indices.Y - 1;
 		}
 
-		for (int32 Column{ static_cast<int32>(Indices.X) }; Column < Indices.Y; ++Column)
+		for (auto Column = static_cast<int32>(Indices.X); Column < Indices.Y; ++Column)
 		{
 			AddTile(FVector2D{ static_cast<float>(Column), static_cast<float>(Row) });
 		}
@@ -58,28 +59,28 @@ void AGrid::Destroy()
 
 FVector2D AGrid::ConvertGridToWorld(const FVector2D& GridPosition)
 {
-	FVector2D Offset{ FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y) };
+	auto Offset = FVector2D{ MinLandscapeBounds.X, MinLandscapeBounds.Y };
 
-	FVector2D X{ GridToWorldX * GridPosition };
-	FVector2D Y{ GridToWorldY * GridPosition };
+	auto X = GridToWorldX * GridPosition;
+	auto Y = GridToWorldY * GridPosition;
 
 	return Offset + FVector2D{ X.X + X.Y, Y.X + Y.Y } * OuterRadius;
 }
 FVector2D AGrid::ConvertWorldToGrid(const FVector2D& WorldPosition)
 {
-	FVector2D Offset{ FVector2D(MinLandscapeBounds.X, MinLandscapeBounds.Y) };
-	FVector2D OffsetWorldPosition{ WorldPosition - Offset };
+	auto Offset = FVector2D{ MinLandscapeBounds.X, MinLandscapeBounds.Y };
+	auto OffsetWorldPosition = WorldPosition - Offset;
 
-	FVector2D X{ WorldToGridX * OffsetWorldPosition };
-	FVector2D Y{ WorldToGridY * OffsetWorldPosition };
+	auto X = WorldToGridX * OffsetWorldPosition;
+	auto Y = WorldToGridY * OffsetWorldPosition;
 
-	FVector2D GridPosition = FVector2D{ X.X + X.Y, Y.X + Y.Y };
+	auto GridPosition = FVector2D{ X.X + X.Y, Y.X + Y.Y };
 
 	GridPosition = GridPosition / OuterRadius;
 
-	FVector Fractional{ GridPosition.X, GridPosition.Y, -GridPosition.X - GridPosition.Y };
-	FVector Rounded{ static_cast<float>(FMath::RoundToInt(Fractional.X)), static_cast<float>(FMath::RoundToInt(Fractional.Y)), static_cast<float>(FMath::RoundToInt(Fractional.Z)) };
-	FVector Diff{ Fractional - Rounded };
+	auto Fractional = FVector{ GridPosition.X, GridPosition.Y, -GridPosition.X - GridPosition.Y };
+	auto Rounded = FVector{ static_cast<float>(FMath::RoundToInt(Fractional.X)), static_cast<float>(FMath::RoundToInt(Fractional.Y)), static_cast<float>(FMath::RoundToInt(Fractional.Z)) };
+	auto Diff = FVector{ Fractional - Rounded };
 
 	Diff.X = FMath::Abs(Diff.X);
 	Diff.Y = FMath::Abs(Diff.Y);
@@ -103,12 +104,12 @@ FVector2D AGrid::ConvertWorldToGrid(const FVector2D& WorldPosition)
 
 const FTileData& AGrid::AddTile(const FVector2D& GridPosition)
 {
-	FVector2D WorldPosition{ ConvertGridToWorld(GridPosition) };
+	auto WorldPosition = ConvertGridToWorld(GridPosition);
 
-	bool bNonWalkable{ false };
-	bool bHit{ UStaticGridLibrary::IsWalkable(GetWorld(), FVector(WorldPosition.X, WorldPosition.Y, 0.f), LineTraceLength, bNonWalkable, WalkableObjects, NonWalkableObjects) };
+	auto bNonWalkable = false;
+	auto bHit = UStaticGridLibrary::IsWalkable(GetWorld(), FVector(WorldPosition.X, WorldPosition.Y, 0.f), LineTraceLength, bNonWalkable, WalkableObjects, NonWalkableObjects);
 
-	FTileData TileData{};
+	auto TileData = FTileData{};
 	TileData.GridPosition = FVector{ GridPosition.X, GridPosition.Y, -GridPosition.X - GridPosition.Y };
 	TileData.WorldPosition = FVector{ WorldPosition.X, WorldPosition.Y, 0.f };
 
@@ -123,7 +124,7 @@ const FTileData& AGrid::AddTile(const FVector2D& GridPosition)
 
 	if (bHit || bNonWalkable)
 	{
-		FString Hash{ UStaticGridLibrary::GetTileHash(GridPosition) };
+		auto Hash = UStaticGridLibrary::GetTileHash(GridPosition);
 		TileData.Hash = Hash;
 		Tiles.Add(TileData.Hash, TileData);
 		return Tiles[TileData.Hash];
@@ -133,7 +134,7 @@ const FTileData& AGrid::AddTile(const FVector2D& GridPosition)
 }
 const bool AGrid::RemoveTile(const FVector2D& GridPosition)
 {
-	FString Hash{ UStaticGridLibrary::GetTileHash(GridPosition) };
+	auto Hash = UStaticGridLibrary::GetTileHash(GridPosition);
 
 	if (Tiles.Contains(Hash))
 	{
@@ -145,7 +146,7 @@ const bool AGrid::RemoveTile(const FVector2D& GridPosition)
 }
 const bool AGrid::UpdateTile(const FTileData& TileData)
 {
-	FString Hash{ UStaticGridLibrary::GetTileHash(FVector2D(TileData.GridPosition.X, TileData.GridPosition.Y)) };
+	auto Hash = UStaticGridLibrary::GetTileHash(FVector2D(TileData.GridPosition.X, TileData.GridPosition.Y));
 
 	if (Tiles.Contains(Hash))
 	{
@@ -157,9 +158,9 @@ const bool AGrid::UpdateTile(const FTileData& TileData)
 }
 const FTileData& AGrid::GetTile(const FVector2D& GridPosition)
 {
-	FString Hash{ UStaticGridLibrary::GetTileHash(GridPosition) };
+	auto Hash = UStaticGridLibrary::GetTileHash(GridPosition);
 
-	FTileData* TileData{ Tiles.Find(Hash) };
+	auto TileData = Tiles.Find(Hash);
 
 	if (TileData)
 	{
@@ -175,20 +176,20 @@ const TMap<FString, FTileData>& AGrid::GetAllTiles()
 
 void AGrid::FindPath(const FTileData& Start, const FTileData& End, TArray<FTileData>& outPath)
 {
-	TArray<FTileData> Frontier{};
+	auto Frontier = TArray<FTileData>{};
 	Frontier.Add(Start);
 
-	TMap<FString, FTileData> From{};
+	auto From = TMap<FString, FTileData>{};
 	From.Add(Start.Hash, FTileData{});
 
 	while (Frontier.Num() > 0)
 	{
-		FTileData Current{ Frontier[0] };
+		auto Current = Frontier[0];
 		Frontier.RemoveAt(0);
 
 		if (Current.Hash.Equals(End.Hash))
 		{
-			FTileData& Parent{ From[Current.Hash] };
+			auto& Parent = From[Current.Hash];
 			while (Parent.State != ETileState::NotValid)
 			{
 				outPath.Add(Parent);
@@ -197,7 +198,7 @@ void AGrid::FindPath(const FTileData& Start, const FTileData& End, TArray<FTileD
 			return;
 		}
 
-		TArray<FTileData> Neighbors{};
+		auto Neighbors = TArray<FTileData>{};
 		GetNeighbors(FVector2D{Current.GridPosition}, Neighbors);
 
 		for (auto& Neighbor : Neighbors)
@@ -213,13 +214,13 @@ void AGrid::FindPath(const FTileData& Start, const FTileData& End, TArray<FTileD
 // TODO: Think about returning just Vectors instead of whole FTileData structs?
 void AGrid::GetTilesInRange(const FVector2D& Origin, const uint8 Range, TArray<FTileData>& outTiles)
 {
-	for (int16 Column{ -Range }; Column <= Range; ++Column)
+	for (auto Column = int16{ -Range }; Column <= Range; ++Column)
 	{
-		for (int16 Row{ FMath::Max<int16>(-Range, -Column - Range) }; Row <= FMath::Min<int16>(Range, -Column + Range); ++Row)
+		for (auto Row = int16{ FMath::Max<int16>(-Range, -Column - Range) }; Row <= FMath::Min<int16>(Range, -Column + Range); ++Row)
 		{
-			FString Hash{ UStaticGridLibrary::GetTileHash(Origin + FVector2D(Column, Row)) };
+			auto Hash = UStaticGridLibrary::GetTileHash(Origin + FVector2D(Column, Row));
 
-			FTileData* TileData{ Tiles.Find(Hash) };
+			auto TileData = Tiles.Find(Hash);
 			
 			if (TileData != nullptr)
 			{
@@ -232,9 +233,9 @@ void AGrid::GetNeighbors(const FVector2D& Origin, TArray<FTileData>& outNeighbor
 {
 	for (auto direction : UStaticGridLibrary::TileDirections)
 	{
-		FString Hash{ UStaticGridLibrary::GetTileHash(Origin + FVector2D(direction)) };
+		auto Hash = UStaticGridLibrary::GetTileHash(Origin + FVector2D(direction));
 
-		FTileData* Neighbor{ Tiles.Find(Hash) };
+		auto Neighbor = Tiles.Find(Hash);
 
 		if (Neighbor != nullptr)
 		{
@@ -256,21 +257,22 @@ void AGrid::DetermineMeasurements()
 {
 	check(IsValid(BPTileDecal) && "No TileDecal is set - it is needed to determine the positions of the tiles!");
 
-	ADecalActor* DecalActor{ Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal)) };
-	FVector DecalSize{ DecalActor->GetDecal()->DecalSize };
+	auto DecalActor = Cast<ADecalActor>(GetWorld()->SpawnActor(BPTileDecal));
+	auto DecalSize = FVector{ DecalActor->GetDecal()->DecalSize };
 	OuterRadius = FMath::Max(DecalSize.Y, DecalSize.Z);
 	DecalActor->Destroy();
 
 	VerticalSpacing = OuterRadius * 1.5f;
 	HorizontalSpacing = FMath::Sqrt(3.f) * OuterRadius;
 
-	for (TActorIterator<ALandscape> ActorItr{ GetWorld() }; ActorItr; ++ActorItr)
+	for (auto ActorItr = TActorIterator<ALandscape>{ GetWorld() }; ActorItr; ++ActorItr)
 	{
-		ALandscape *Landscape{ *ActorItr };
+		auto Landscape = *ActorItr;
 
 		check(IsValid(Landscape) && "No Landscape is found in the level!");
 
-		FVector Origin{}, Extent{};
+		auto Origin = FVector{};
+		auto Extent = FVector{};
 		Landscape->GetActorBounds(false, Origin, Extent);
 		MinLandscapeBounds = Origin - Extent;
 		MaxLandscapeBounds = Origin + Extent;

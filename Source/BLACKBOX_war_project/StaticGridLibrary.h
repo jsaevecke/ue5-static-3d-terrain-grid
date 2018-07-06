@@ -85,8 +85,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FORCEINLINE FVector2D CalculateOffsetIndices(int32 Row, int32 Width)
 	{
-		int32 X{ FMath::FloorToInt(Row / 2.f) };
-		int32 Y{ Width - X };
+		auto X = FMath::FloorToInt(Row / 2.f);
+		auto Y = Width - X;
 		return FVector2D{ static_cast<float>(X * (-1)), static_cast<float>(Y) };
 	}
 

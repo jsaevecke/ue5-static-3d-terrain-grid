@@ -23,7 +23,7 @@ void AObjectPool::BeginPlay()
 
 void AObjectPool::ReserveObjects()
 {
-	for (uint8 Count{ 0 }; Count < ReserveObjectCount; ++Count)
+	for (auto Count = uint8{ 0 }; Count < ReserveObjectCount; ++Count)
 	{
 		CreateObject(false);
 	}
@@ -33,7 +33,7 @@ AActor* const AObjectPool::CreateObject(bool bInUse)
 {
 	if (ObjectToPool && (CurrentObjectCount < MaxObjectCount || MaxObjectCount == 0))
 	{
-		AActor* Object{ GetWorld()->SpawnActor(ObjectToPool) };
+		auto Object = GetWorld()->SpawnActor(ObjectToPool);
 		Object->SetActorHiddenInGame(true);
 		Object->SetFolderPath(ObjectFolder);
 
@@ -58,7 +58,7 @@ AActor* const AObjectPool::GetObject()
 {
 	if (NotInUseObjects.Num() > 0)
 	{
-		AActor* const Object{ NotInUseObjects.Pop() };
+		auto const Object = NotInUseObjects.Pop();
 
 		InUseObjects.Add(Object);
 
@@ -74,7 +74,7 @@ void AObjectPool::ReturnObject(AActor* const Object)
 {
 	check(IsValid(Object) && "AObjectPool::ReturnObject : Non valid pointer is given!");
 
-	int32 Index{};
+	auto Index = int32{};
 	if (InUseObjects.Find(Object, Index))
 	{
 		InUseObjects.Remove(Object);
