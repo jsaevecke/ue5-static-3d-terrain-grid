@@ -44,9 +44,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	const FTileData& AddTile(const FVector2D& GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	bool RemoveTile(const FVector2D& GridPosition);
+	const bool RemoveTile(const FVector2D& GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	bool UpdateTile(const FTileData& TileData);
+	const bool UpdateTile(const FTileData& TileData);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	const FTileData& GetTile(const FVector2D& GridPosition);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
@@ -55,7 +55,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	void FindPath(const FTileData& Start, const FTileData& End, TArray<FTileData>& outPath);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
-	void GetTilesInRange(const FVector2D& Origin, uint8 Range, TArray<FTileData>& outTiles);
+	void GetTilesInRange(const FVector2D& Origin, const uint8 Range, TArray<FTileData>& outTiles);
 	UFUNCTION(BlueprintCallable, Category = "Grid|Tile")
 	void GetNeighbors(const FVector2D& Origin, TArray<FTileData>& outNeighbors);
 

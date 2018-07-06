@@ -85,9 +85,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grid")
 	static FORCEINLINE FVector2D CalculateOffsetIndices(int32 Row, int32 Width)
 	{
-		int32 x = FMath::FloorToInt(Row / 2.f);
-		int32 y = Width - x;
-		return FVector2D(x * (-1), y);
+		int32 X{ FMath::FloorToInt(Row / 2.f) };
+		int32 Y{ Width - X };
+		return FVector2D{ static_cast<float>(X * (-1)), static_cast<float>(Y) };
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
@@ -97,5 +97,5 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category = "Grid")
-	static bool IsWalkable(UWorld* const World, const FVector& WorldPosition, float LineTraceLength, bool& bNonWalkable, TArray<TEnumAsByte<ECollisionChannel>> WalkableObjects, TArray<TEnumAsByte<ECollisionChannel>> NonWalkableObjects);
+	static bool IsWalkable(UWorld* const World, const FVector& WorldPosition, const float LineTraceLength, bool& bNonWalkable, const TArray<TEnumAsByte<ECollisionChannel>>& WalkableObjects, const TArray<TEnumAsByte<ECollisionChannel>>& NonWalkableObjects);
 };
