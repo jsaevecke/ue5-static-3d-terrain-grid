@@ -7,10 +7,12 @@
 // TODO : Exclude Obstructed Tiles
 // TODO : Multiplayer
 // TODO : Camera
+
 // Priority: Unimportant right now
 // TODO : A* instead of simple breadth search
 // TODO : Dynamic A*
 // TODO : Smartphone/Tablet Support
+
 
 #pragma once
 
@@ -97,7 +99,7 @@ private:
 	UPROPERTY()
 	FVector MaxLandscapeBounds;
 	UPROPERTY()
-	FVector AbsoluteLandscapeSize;
+	FVector LandscapeSize;
 	UPROPERTY()
 	uint8 VerticalTileCount;
 	UPROPERTY()

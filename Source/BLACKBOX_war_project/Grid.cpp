@@ -276,9 +276,9 @@ void AGrid::DetermineMeasurements()
 		Landscape->GetActorBounds(false, Origin, Extent);
 		MinLandscapeBounds = Origin - Extent;
 		MaxLandscapeBounds = Origin + Extent;
-		AbsoluteLandscapeSize = MaxLandscapeBounds - MinLandscapeBounds;
-		HorizontalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.X / HorizontalSpacing);
-		VerticalTileCount = static_cast<uint8>(AbsoluteLandscapeSize.Y / VerticalSpacing);
+		LandscapeSize = MaxLandscapeBounds - MinLandscapeBounds;
+		HorizontalTileCount = static_cast<uint8>(LandscapeSize.X / HorizontalSpacing);
+		VerticalTileCount = static_cast<uint8>(LandscapeSize.Y / VerticalSpacing);
 
 		break;
 	}

@@ -8,7 +8,7 @@ public class BLACKBOX_war_project : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "GameSparks", "OnlineSubsystem"  });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
