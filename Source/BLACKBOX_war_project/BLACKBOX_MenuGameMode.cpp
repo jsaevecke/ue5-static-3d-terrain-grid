@@ -1,6 +1,7 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
 #include "BLACKBOX_MenuGameMode.h"
+#include "StaticGameSparkLibrary.h"
 #include "GameSparks/Public/GameSparksModule.h"
 
 void ABLACKBOX_MenuGameMode::BeginPlay()
@@ -16,6 +17,8 @@ void ABLACKBOX_MenuGameMode::BeginPlay()
 		GameSparks->Disconnect();
 		GameSparks->Connect(FString("v356285XYYnC"), FString("KEUTGVaTqY1cfqGbwl6Z7xFhfrTeUBxX"), true, false);
 	}
+
+	UStaticGameSparkLibrary::InitStatics(GetWorld());
 }
 void ABLACKBOX_MenuGameMode::EndPlay(EEndPlayReason::Type Reason)
 {
