@@ -21,7 +21,7 @@ class BLACKBOX_WAR_PROJECT_API UGInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameSpark")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameSpark")
 	class UGameSparksObject* GameSparksObject;
 private:
 	EState CurrentState;
