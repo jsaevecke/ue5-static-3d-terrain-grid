@@ -15,19 +15,24 @@ enum class EState : uint8
 	Game UMETA(DisplayName = "Game")
 };
 
+class UUserWidget;
+class UGameSparksObject;
+
 UCLASS()
 class BLACKBOX_WAR_PROJECT_API UGInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameSpark")
-	class UGameSparksObject* GameSparksObject;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameSpark")
+	UGameSparksObject* GameSparksObject;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
 	TMap<EState, TSubclassOf<UUserWidget>> StateWidgetBlueprints;
 private:
 	UPROPERTY()
 	TMap<EState, UUserWidget*> StateWidgets;
+	UPROPERTY()
+	UUserWidget* ActiveStateWidget;
 	EState CurrentState;
 public:
 	UGInstance();

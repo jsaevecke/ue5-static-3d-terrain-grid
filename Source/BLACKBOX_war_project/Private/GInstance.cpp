@@ -2,6 +2,7 @@
 
 #include "GInstance.h"
 #include "Private/GameSparksObject.h"
+#include "Blueprint/UserWidget.h"
 
 UGInstance::UGInstance()
 	: GameSparksObject(nullptr), CurrentState(EState::None)
@@ -42,20 +43,23 @@ void UGInstance::Shutdown()
 
 void UGInstance::OnStateChange(EState NewState)
 {
-	switch (NewState)
+	if (StateWidgetBlueprints.Contains(NewState))
 	{
-	case EState::LoginMenu:
-		UE_LOG(LogTemp, Warning, TEXT("Changed to login menu"));
-		break;
-	case EState::MainMenu:
-		UE_LOG(LogTemp, Warning, TEXT("Changed to main menu"));
-		break;
-	case EState::Game:
-		UE_LOG(LogTemp, Warning, TEXT("Changed to game"));
-		break;
-	default:
-		break;
+		if (!StateWidgets.Contains(NewState))
+		{
+			auto Widget = CreateWidget<UUserWidget>(this, StateWidgetBlueprints[NewState]);
+			StateWidgets.Add(NewState, Widget);
+		}
+
+		if (IsValid(ActiveStateWidget))
+			ActiveStateWidget->RemoveFromParent();
+		
+		ActiveStateWidget = StateWidgets[NewState];
+		ActiveStateWidget->AddToViewport();
+		return;
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("State widget does not exist for this state"));
 }
 
 
