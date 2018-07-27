@@ -8,7 +8,7 @@
 #include "./Results/PlayerDisconnectMessage.hpp"
 #include "./CustomCommand.hpp"
 #include "../IRTSessionInternal.hpp"
-#include <iostream>
+//#include <iostream>
 
 using namespace GameSparks::RT::Proto;
 using namespace Com::Gamesparks::Realtime::Proto;
@@ -46,7 +46,7 @@ System::Failable<IRTCommand*> CommandFactory::GetCommand(int opCode, int sender,
     }
     GS_CATCH(e)
     {
-        std::clog << "exception: " << e.Format() << std::endl;
+        gsstl::clog << "exception: " << e.Format() << gsstl::endl;
         GS_THROW(e);
         //assert(false);
 		//return nullptr;

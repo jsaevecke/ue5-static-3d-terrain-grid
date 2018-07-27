@@ -7,8 +7,8 @@ namespace System {
 
 	class InvalidOperationException : public SystemException
 	{
-		public: InvalidOperationException(const std::string what) : SystemException(what, "System.InvalidOperationException") {}
-		public: InvalidOperationException(const std::string what, const std::string typeName) : SystemException(what, typeName) {}
+		public: InvalidOperationException(const gsstl::string what) : SystemException(what, "System.InvalidOperationException") {}
+		public: InvalidOperationException(const gsstl::string what, const gsstl::string typeName) : SystemException(what, typeName) {}
 	};
 
 } /* namespace System */

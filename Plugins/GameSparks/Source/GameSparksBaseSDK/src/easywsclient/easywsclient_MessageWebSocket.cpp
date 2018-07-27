@@ -114,7 +114,6 @@ namespace {
 
 						PushResult({ Result::Type::Error, "Error while retrieving data: " + platform_to_std(ex->Message) });
 					}
-
 				});
 
 				auto connectOp = webSocket->ConnectAsync(pUri);
@@ -273,13 +272,13 @@ namespace {
 				LivetimeGuard::guard lock(LivetimeGuard::mtx);
 				if (!liveTimeGuard.isAlive()) return;
 
-				std::lock_guard<std::recursive_mutex> guard(resultQueueMutex);
+				gsstl::lock_guard<gsstl::recursive_mutex> guard(resultQueueMutex);
 				resultQueue.push(result);
 			}
 
 			bool PopResult(Result& result)
 			{
-				std::lock_guard<std::recursive_mutex> guard(resultQueueMutex);
+				gsstl::lock_guard<gsstl::recursive_mutex> guard(resultQueueMutex);
 				if (resultQueue.empty())
 				{
 					return false;
@@ -294,8 +293,8 @@ namespace {
 
 			MessageWebSocket^  webSocket;
 
-			std::recursive_mutex resultQueueMutex;
-			std::queue<Result> resultQueue;
+			gsstl::recursive_mutex resultQueueMutex;
+			gsstl::queue<Result> resultQueue;
 			readyStateValues readyState;
 
 			// it's safest to make this the very last member, so that

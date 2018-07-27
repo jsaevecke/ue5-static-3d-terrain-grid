@@ -1,5 +1,5 @@
-#include <thread>
-#include <iostream>
+//#include <thread>
+//#include <iostream>
 #include "../Commands/Requests/LoginCommand.hpp"
 #include "../../System/Exception.hpp"
 #include "./FastConnection.hpp"
@@ -10,8 +10,8 @@ namespace System {class IAsyncResult;}
 
 namespace GameSparks { namespace RT { namespace Connection {
 
-FastConnection::FastConnection(const std::string &remotehost, const std::string& port,
-                               IRTSessionInternal *session, std::recursive_mutex& sessionSendMutex)
+FastConnection::FastConnection(const gsstl::string &remotehost, const gsstl::string& port,
+                               IRTSessionInternal *session, gsstl::recursive_mutex& sessionSendMutex)
     : Connection(remotehost, port, session)
 {
     callback = [this](const System::IAsyncResult& ar){Recv(ar);};
@@ -22,8 +22,8 @@ FastConnection::FastConnection(const std::string &remotehost, const std::string&
 
         // we need to lock sessionSendMutex first to avoid ABA deadlock
         {
-            std::lock_guard<std::recursive_mutex> lock1(sessionSendMutex);
-            std::lock_guard<std::recursive_mutex> lock2(sessionMutex);
+            gsstl::lock_guard<gsstl::recursive_mutex> lock1(sessionSendMutex);
+            gsstl::lock_guard<gsstl::recursive_mutex> lock2(sessionMutex);
             if (!this->session) return;
             DoLogin ();
         }
@@ -57,7 +57,7 @@ void FastConnection::StopInternal() {
     // TODO: check if we need to close
     //if(client != nullptr)
     //    client.Close ();
-    std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+    gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
     session = nullptr;
 }
 
@@ -66,7 +66,7 @@ void FastConnection::DoLogin() {
 
     GS_TRY
     {
-        std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+        gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 
         while (session != nullptr && session->GetConnectState() < GameSparksRT::ConnectState::ReliableAndFastSend)
         {
@@ -77,13 +77,13 @@ void FastConnection::DoLogin() {
             // this is to avoid excessive delays before calling session->OnReady()
             auto mustConnectIn = GameSparks::Core::GSClientConfig::instance().ComputeSleepPeriod(attempts);
             for(
-                auto start = std::chrono::steady_clock::now();
-                std::chrono::steady_clock::now() - start < std::chrono::duration<float>(mustConnectIn) && // mustConnectIn expired?
+                auto start = gsstl::chrono::steady_clock::now();
+                gsstl::chrono::steady_clock::now() - start < gsstl::chrono::duration<float>(mustConnectIn) && // mustConnectIn expired?
                 session != nullptr && session->GetConnectState() < GameSparksRT::ConnectState::ReliableAndFastSend // same condition as in the while above
                 ;
             )
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                gsstl::this_thread::sleep_for(gsstl::chrono::milliseconds(100));
             }
 
             attempts++;
@@ -107,14 +107,14 @@ void FastConnection::Recv(const System::IAsyncResult& res)
     }
     GS_CATCH(e)
     {
-        std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+        gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
         if(session)
         {
             session->Log("FastConnection EndReceive", GameSparksRT::LogLevel::LL_INFO, e.Format());
         }
         else
         {
-            std::clog << "FastConnection EndReceive:" << e.Format() << std::endl;
+            gsstl::clog << "FastConnection EndReceive:" << e.Format() << gsstl::endl;
         }
     }
     //finally
@@ -138,7 +138,7 @@ void FastConnection::ReadBuffer(int read)
 {
     GS_TRY
     {
-		std::lock_guard<std::recursive_mutex> lg(sessionMutex);
+		gsstl::lock_guard<gsstl::recursive_mutex> lg(sessionMutex);
 		if (!session)
 			return;
 
@@ -159,20 +159,22 @@ void FastConnection::ReadBuffer(int read)
             }
             GS_CATCH(e)
             {
-                std::clog << e << std::endl;
-                static std::mutex globalMutex;
-                std::lock_guard<std::mutex> globalLock(globalMutex);
-                std::clog << "packet was:" << std::endl;
+                gsstl::clog << e << gsstl::endl;
+                static gsstl::mutex globalMutex;
+                gsstl::lock_guard<gsstl::mutex> globalLock(globalMutex);
+                gsstl::clog << "packet was:" << gsstl::endl;
                 for(int i=0; i!=read; ++i)
                 {
                     if(size_t(i) >= buffer.size())
                     {
-                        std::clog << std::endl << "aborting buffer dump: i >= buffer.size(), i.e. i = " << i << ", buffer.size() = " << buffer.size();
+                        gsstl::clog << gsstl::endl << "aborting buffer dump: i >= buffer.size(), i.e. i = " << i << ", buffer.size() = " << buffer.size();
                         break;
                     }
-                    std::clog << std::hex << std::setw(2) << std::setfill('0') << int(buffer[i]);
+                    //TODO
+                    //gsstl::clog << gsstl::hex << gsstl::setw(2) << gsstl::setfill('0') << int(buffer[i]);
+                    gsstl::clog << gsstl::hex << int(buffer[i]);
                 }
-                std::clog << std::endl;
+                gsstl::clog << gsstl::endl;
                 return;
             }
         }

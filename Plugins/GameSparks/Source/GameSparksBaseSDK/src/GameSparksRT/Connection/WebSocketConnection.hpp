@@ -14,7 +14,7 @@ namespace GameSparks { namespace RT { namespace Connection {
 	class WebSocketConnection : public Connection
 	{
 		public:
-			WebSocketConnection(const std::string& remotehost, const std::string& remoteport, IRTSessionInternal* session);
+			WebSocketConnection(const gsstl::string& remotehost, const gsstl::string& remoteport, IRTSessionInternal* session);
 			
 			virtual System::Failable<int> Send(const Commands::RTRequest& request) override;
 			virtual void StopInternal() override;
@@ -26,7 +26,7 @@ namespace GameSparks { namespace RT { namespace Connection {
 			static void ErrorCallback(const easywsclient::WSError& error, void* This);
 			System::Failable<bool> read(PositionStream& stream, Proto::Packet& p);
 
-			std::unique_ptr<easywsclient::WebSocket> client;
+			gsstl::unique_ptr<easywsclient::WebSocket> client;
 			easywsclient::WebSocket::readyStateValues lastReadyState;
 	};
 

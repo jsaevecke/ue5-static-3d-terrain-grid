@@ -4777,60 +4777,6 @@ private:
 
 
 // Generate a delegate for the OnGetResult event
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnXboxOneBuyGoodsRequest_Response, FGSBuyVirtualGoodResponse, BuyVirtualGoodResponse, bool, hasErrors);
-
-UCLASS()
-class GAMESPARKS_API UGSXboxOneBuyGoodsRequest : public UOnlineBlueprintCallProxyBase
-{
-	GENERATED_BODY()
-
-public:
-	
-	/* Event which triggers when the content has been retrieved */
-	UPROPERTY(BlueprintAssignable, Category = "GameSparks")
-	FOnXboxOneBuyGoodsRequest_Response OnResponse;
-	
-	/**
-	Consumes a consumable item from Xbox Live
-	*/
-	UFUNCTION(BlueprintCallable, meta = (DisplayName="GS XboxOneBuyGoodsRequest", BlueprintInternalUseOnly = "true"), Category = "GameSparks|Requests|Store")
-	static UGSXboxOneBuyGoodsRequest* SendXboxOneBuyGoodsRequest(FString CurrencyCode = "", FString ItemId = "", int32 ItemsConsumed = 0, float SubUnitPrice = 0.0f, bool UniqueTransactionByPlayer = false,  UGameSparksScriptData* ScriptData = nullptr, bool Durable = false, int32 RequestTimeoutSeconds = 0);
-	
-	void Activate() override;
-	
-	~UGSXboxOneBuyGoodsRequest();
-
-private:
-	
-	UPROPERTY()
-	FString currencyCode;
-	
-	UPROPERTY()
-	FString itemId;
-	
-	UPROPERTY()
-	int32 itemsConsumed;
-
-	
-	UPROPERTY()
-	float subUnitPrice;
-	
-	UPROPERTY()
-	bool uniqueTransactionByPlayer;
-
-	UPROPERTY()
-	UGameSparksScriptData* scriptData;
-	
-	UPROPERTY()
-	bool durable;
-	
-	UPROPERTY()
-	int32 requestTimeoutSeconds; 
-	
-};
-
-
-// Generate a delegate for the OnGetResult event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnXboxOneConnectRequest_Response, FGSAuthenticationResponse, AuthenticationResponse, bool, hasErrors);
 
 UCLASS()

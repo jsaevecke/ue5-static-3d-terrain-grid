@@ -11,7 +11,7 @@ using namespace System;
 using namespace GameSparks::RT::Commands;
 using namespace Com::Gamesparks::Realtime::Proto;
 
-ReliableConnection::ReliableConnection  (const std::string& remotehost, const std::string& remoteport, IRTSessionInternal* session)
+ReliableConnection::ReliableConnection  (const gsstl::string& remotehost, const gsstl::string& remoteport, IRTSessionInternal* session)
         :Connection(remotehost, remoteport, session)
         ,client(AddressFamily::InterNetwork)
 {
@@ -48,7 +48,7 @@ System::Failable<int> ReliableConnection::Send(const RTRequest& request){
         }
         GS_CATCH(e)
         {
-            std::clog << e << std::endl;
+            gsstl::clog << e << gsstl::endl;
             if (session != nullptr && !stopped) {
                 session->SetConnectState(GameSparksRT::ConnectState::Disconnected);
                 session->Log ("ReliableConnection", GameSparksRT::LogLevel::LL_DEBUG, e.Format());
@@ -96,7 +96,7 @@ void ReliableConnection::ConnectCallback(IAsyncResult /*result*/)
 
         Packet p;
         {
-            std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+            gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
             if(!session) return; // re-evaluate for expression
             p = Packet(*session);  // reset packet to default state
         }
@@ -123,7 +123,7 @@ void ReliableConnection::ConnectCallback(IAsyncResult /*result*/)
             }
 
             {
-                std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+                gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
                 if(!session) continue; // re-evaluate for expression
                 p = Packet(*session);  // reset packet to default state
             }
@@ -137,7 +137,7 @@ void ReliableConnection::ConnectCallback(IAsyncResult /*result*/)
     }
     GS_CATCH(e)
     {
-        std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+        gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
         if (session != nullptr && !stopped) {
             session->SetConnectState(GameSparksRT::ConnectState::Disconnected);
 
@@ -163,7 +163,7 @@ System::Failable<bool> ReliableConnection::read(PositionStream& stream, Packet& 
 }
 
 void ReliableConnection::StopInternal() {
-    std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+    gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 
     GS_TRY
     {

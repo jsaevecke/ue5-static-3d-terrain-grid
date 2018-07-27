@@ -4,28 +4,28 @@
 
 namespace System { namespace Text { namespace Encoding {
 
-std::string UTF8::GetString(const System::Bytes& in)
+gsstl::string UTF8::GetString(const System::Bytes& in)
 {
-    std::string out;
-    std::copy(in.begin(), in.end(), std::back_inserter(out));
+    gsstl::string out;
+    gsstl::copy(in.begin(), in.end(), gsstl::back_inserter(out));
     return out;
 }
 
-std::string UTF8::GetString(const System::Bytes& in, int index, int count)
+gsstl::string UTF8::GetString(const System::Bytes& in, int index, int count)
 {
 
     assert(index < static_cast<int>(in.size()));
     assert(count <= static_cast<int>(in.size())-index);
 
-    std::string out;
-    std::copy(in.begin()+index, in.begin()+index+count, std::back_inserter(out));
+    gsstl::string out;
+    gsstl::copy(in.begin()+index, in.begin()+index+count, gsstl::back_inserter(out));
     return out;
 }
 
-System::Bytes UTF8::GetBytes(const std::string& in)
+System::Bytes UTF8::GetBytes(const gsstl::string& in)
 {
     System::Bytes out;
-    std::copy(in.begin(), in.end(), std::back_inserter(out));
+    gsstl::copy(in.begin(), in.end(), gsstl::back_inserter(out));
     return out;
 }
 

@@ -1,6 +1,6 @@
-#include <cassert>
-#include <iostream>
-#include <iomanip>
+//#include <cassert>
+//#include <iostream>
+//#include <iomanip>
 
 #include "./Socket.hpp"
 #include "../../ObjectDisposedException.hpp"
@@ -16,7 +16,7 @@
 #   else
 #       include <sys/fcntl.h>
 #   endif
-#include <iostream>
+//#include <iostream>
 #endif
 
 #if defined(WIN32)
@@ -39,7 +39,7 @@
 
 namespace System { namespace Net { namespace Sockets {
 
-static std::string mbedtls_error_to_string(int result)
+static gsstl::string mbedtls_error_to_string(int result)
 {
     assert(result < 0); // you cannot translate an error that is none.
 
@@ -77,7 +77,7 @@ void Socket::Close()
         // wait for the recv to timeout
         while(isInsideInternalRecv)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+            gsstl::this_thread::sleep_for(gsstl::chrono::milliseconds(1000/60));
         }
         mbedtls_net_free(&netCtx);
 
@@ -94,7 +94,7 @@ void Socket::teardown()
     // wait for the recv to timeout
     while(isInsideInternalRecv)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+        gsstl::this_thread::sleep_for(gsstl::chrono::milliseconds(1000/60));
     }
 
     if(connectThread.joinable())
@@ -105,7 +105,7 @@ void Socket::teardown()
         
         while(state == State::CONNECTING)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+            gsstl::this_thread::sleep_for(gsstl::chrono::milliseconds(1000/60));
         }
         #endif /* defined(IW_SDK) */
         
@@ -204,7 +204,7 @@ void Socket::BeginConnect(
     assert(state == State::CLOSED);
     state = State::CONNECTING;
 
-    connectThread = std::thread([&, endpoint, requestCallback](){
+    connectThread = gsstl::thread([&, endpoint, requestCallback](){
         if(protocolType == ProtocolType::Tcp)
             System::Threading::Thread::SetName("TCP Connect thread");
         else
@@ -218,7 +218,7 @@ void Socket::BeginConnect(
             }
             else
             {
-                std::cerr << "INFO: connect finished on torn down socket." << std::endl;
+                gsstl::cerr << "INFO: connect finished on torn down socket." << gsstl::endl;
             }
         }
         //assert(protocolType == ProtocolType::Tcp); // the udp thread should never stop
@@ -244,7 +244,7 @@ bool Socket::Connect(const IPEndPoint &endpoint) {
         state = State::CLOSED;
 
         if(!isTearingDown)
-            std::clog << "ERROR: Connect failed: " << mbedtls_error_to_string(result) << std::endl;
+            gsstl::clog << "ERROR: Connect failed: " << mbedtls_error_to_string(result) << gsstl::endl;
         return false;
     }
 }
@@ -271,7 +271,7 @@ void Socket::BeginReceive(System::Bytes &buffer, const AsyncCallback &callback) 
         }
         else
         {
-            std::cerr << "INFO: UDP-Socket read error: " << mbedtls_error_to_string(ar.numBytesRead) << std::endl;
+            gsstl::cerr << "INFO: UDP-Socket read error: " << mbedtls_error_to_string(ar.numBytesRead) << gsstl::endl;
         }
     }
     else
@@ -335,7 +335,7 @@ Failable<int> Socket::Receive(System::Bytes &buffer, int offset, int count) {
     auto result = mbedtls_net_recv(&netCtx, buffer.data() + offset, count);
     if (result < 0)
     {
-        GS_THROW(System::ObjectDisposedException("Socket has closed or read error:" + std::string(mbedtls_error_to_string(result))));
+        GS_THROW(System::ObjectDisposedException("Socket has closed or read error:" + gsstl::string(mbedtls_error_to_string(result))));
     }
     if (result == 0)
     {
@@ -355,9 +355,9 @@ bool Socket::Connected() const {
 }
 
 
-std::mutex output_mutex;
+gsstl::mutex output_mutex;
 
-std::ostream& operator << (std::ostream& os, const System::Bytes& bytes)
+gsstl::ostream& operator << (gsstl::ostream& os, const System::Bytes& bytes)
 {
     (void)bytes;
 /*
@@ -387,7 +387,7 @@ Failable<void> Socket::Send(const System::Bytes &buffer, int offset, int size) {
     int result = mbedtls_net_send(&netCtx, buffer.data()+offset, size);
     if (result < 0)
     {
-        GS_THROW(ObjectDisposedException("Socket has closed or read error:" + std::string(mbedtls_error_to_string(result))));
+        GS_THROW(ObjectDisposedException("Socket has closed or read error:" + gsstl::string(mbedtls_error_to_string(result))));
     }
     return {};
 }
@@ -404,7 +404,7 @@ void Socket::Poll() {
 		Failable<int> res = Receive(*receiveBuffer);
 		if (!res.isOK())
 		{
-			std::clog << "Error: read() failed: " << res.GetException() << std::endl;
+			gsstl::clog << "Error: read() failed: " << res.GetException() << gsstl::endl;
 			return;
 		}
 		ar.numBytesRead = res.GetResult();
@@ -415,7 +415,7 @@ void Socket::Poll() {
         }
         else if(ar.numBytesRead < 0)
         {
-            std::clog << "ERROR: read() failed: " << mbedtls_error_to_string(ar.numBytesRead) << std::endl;
+            gsstl::clog << "ERROR: read() failed: " << mbedtls_error_to_string(ar.numBytesRead) << gsstl::endl;
             assert(false);
         }
         else

@@ -14,7 +14,7 @@ namespace GameSparks { namespace RT { namespace Connection {
 	class FastConnection : public Connection
 	{
 		public:
-			FastConnection (const std::string& remotehost, const std::string& port, IRTSessionInternal* session, std::recursive_mutex& sessionSendMutex);
+			FastConnection (const gsstl::string& remotehost, const gsstl::string& port, IRTSessionInternal* session, gsstl::recursive_mutex& sessionSendMutex);
 			virtual System::Failable<int> Send(const Commands::RTRequest &request) override;
 			virtual void StopInternal() override;
 

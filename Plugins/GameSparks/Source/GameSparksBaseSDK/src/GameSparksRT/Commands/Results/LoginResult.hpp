@@ -4,7 +4,7 @@
 #include "./AbstractResult.hpp"
 #include "../../IRTCommand.hpp"
 #include "../../../../include/System/Nullable.hpp"
-#include <string>
+//#include <string>
 #include <vector>
 
 namespace System { namespace IO { class Stream; } }
@@ -15,9 +15,9 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 	{
 		public:
 			bool Success;
-			std::string ReconnectToken;
+			gsstl::string ReconnectToken;
 			System::Nullable<int> PeerId;
-			std::vector<int> ActivePeers;
+			gsstl::vector<int> ActivePeers;
 			System::Nullable<int> FastPort;
 
 			static System::Failable<LoginResult*> Deserialize(System::IO::Stream& stream);

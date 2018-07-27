@@ -7,8 +7,8 @@ namespace System {
 
 	class NotSupportedException : public SystemException
 	{
-		public: NotSupportedException(const std::string what) : SystemException(what, "System.NotSupportedException") {}
-		public: NotSupportedException(const std::string what, const std::string typeName) : SystemException(what, typeName) {}
+		public: NotSupportedException(const gsstl::string what) : SystemException(what, "System.NotSupportedException") {}
+		public: NotSupportedException(const gsstl::string what, const gsstl::string typeName) : SystemException(what, typeName) {}
 	};
 
 } /* namespace System */

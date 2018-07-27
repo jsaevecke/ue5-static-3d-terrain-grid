@@ -3,7 +3,7 @@
 namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 
 
-LoginCommand::LoginCommand(const std::string connectToken)
+LoginCommand::LoginCommand(const gsstl::string connectToken)
 : RTRequest(0)
 , Token(connectToken)
 , ClientVersion(_clientVersion){ }

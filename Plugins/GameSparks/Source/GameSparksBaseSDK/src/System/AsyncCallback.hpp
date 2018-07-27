@@ -3,10 +3,11 @@
 
 #include <functional>
 #include "IAsyncResult.hpp"
+#include <GameSparks/gsstl.h>
 
 namespace System {
 
-    typedef std::function<void (const IAsyncResult& ar)> AsyncCallback;
+    typedef gsstl::function<void (const IAsyncResult& ar)> AsyncCallback;
 
 }
 

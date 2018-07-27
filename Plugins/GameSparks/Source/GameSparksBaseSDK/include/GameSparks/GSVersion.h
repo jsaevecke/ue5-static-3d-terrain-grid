@@ -9,7 +9,7 @@ namespace GameSparks
 {
 	namespace
 	{
-		static gsstl::string GS_SDK_VERSION = "1.1.22.0";
+		static gsstl::string GS_SDK_VERSION = "1.1.23.0";
 	}
 }
 

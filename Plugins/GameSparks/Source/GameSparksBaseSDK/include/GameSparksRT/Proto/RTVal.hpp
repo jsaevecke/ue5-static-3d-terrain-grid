@@ -6,7 +6,7 @@
 #include "System/FailableForward.hpp"
 #include "../GSLinking.hpp"
 
-#include <string>
+//#include <string>
 #include <cstdint>
 
 namespace GameSparks { namespace RT {
@@ -22,14 +22,14 @@ namespace GameSparks { namespace RT {
 			RTVal(int64_t value);
 			RTVal(float value);
 			RTVal(double value);
-			RTVal(const std::string& value);
+			RTVal(const gsstl::string& value);
 			RTVal(const RTData& value);
 			explicit RTVal(const RTVector& value);
 
             /// return true, if any of the values is set
             explicit operator bool() const;
 
-            friend std::ostream& operator << (std::ostream& os, const RTVal&);
+            friend gsstl::ostream& operator << (gsstl::ostream& os, const RTVal&);
 		private:
             friend class RTValSerializer;
             friend class RTDataSerializer;
@@ -43,7 +43,7 @@ namespace GameSparks { namespace RT {
 			System::Nullable<float> float_val;
 			System::Nullable<double> double_val;
 			System::Nullable<RTData> data_val;
-			System::Nullable<std::string> string_val;
+			System::Nullable<gsstl::string> string_val;
 			System::Nullable<RTVector> vec_val;
 	};
 

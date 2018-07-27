@@ -6,7 +6,16 @@
 #include <GameSparks/gsstl.h>
 #include <GameSparks/GSObject.h>
 #include <GameSparks/GSTime.h>
+
 #include <cmath>
+
+#define DEFAULT_RETRY_BASE  2.0f
+#define DEFAULT_RETRY_MAX 60.0f
+#define DEFAULT_REQUEST_TIMEOUT 15.0f
+#define DEFAULT_DURABLE_CONCURRENT_REQUESTS 1
+#define DEFAULT_DURABLE_DRAIN_INTERVAL 0.1f
+#define DEFAULT_HANDSHAKE_OFFSET 2.0f
+#define MILLIS 1000.0f
 
 // if somehow the windows header got pulled in without NOMINMAX: being defined, min and max get defined as macros
 #if defined(min)
@@ -54,38 +63,31 @@ namespace GameSparks{ namespace Core {
                     setFromObject(obj);
                 }
 
+            
                 void setFromObject(const GSData& obj)
                 {
-                    static const Seconds DEFAULT_RETRY_BASE                  = 2.0f;
-                    static const Seconds DEFAULT_RETRY_MAX                   = 60.0f;
-                    static const Seconds DEFAULT_REQUEST_TIMEOUT             = 15.0f;
-                    static const int   DEFAULT_DURABLE_CONCURRENT_REQUESTS   = 1;
-                    static const Seconds DEFAULT_DURABLE_DRAIN_INTERVAL      = 0.1f;
-                    static const Seconds DEFAULT_HANDSHAKE_OFFSET            = 2.0f;
-                    static const auto ms = 1000.0f;
-
-                    retryBase = obj.GetFloat("retryBase").GetValueOrDefault(DEFAULT_RETRY_BASE * ms) / ms;
+                    retryBase = obj.GetFloat("retryBase").GetValueOrDefault(DEFAULT_RETRY_BASE * MILLIS) / MILLIS;
                     if (retryBase <= 0.0) retryBase = DEFAULT_RETRY_BASE;
 
-                    retryMax = obj.GetFloat("retryMax").GetValueOrDefault(DEFAULT_RETRY_MAX * ms) / ms;
+                    retryMax = obj.GetFloat("retryMax").GetValueOrDefault(DEFAULT_RETRY_MAX * MILLIS) / MILLIS;
                     if (retryMax <= 0.0) retryMax = DEFAULT_RETRY_MAX;
 
-                    requestTimeout = obj.GetFloat("requestTimeout").GetValueOrDefault(DEFAULT_REQUEST_TIMEOUT * ms) / ms;
+                    requestTimeout = obj.GetFloat("requestTimeout").GetValueOrDefault(DEFAULT_REQUEST_TIMEOUT * MILLIS) / MILLIS;
                     if (requestTimeout <= 0.0) requestTimeout = DEFAULT_REQUEST_TIMEOUT;
 
                     durableConcurrentRequests = obj.GetInt("durableConcurrentRequests").GetValueOrDefault(DEFAULT_DURABLE_CONCURRENT_REQUESTS);
                     if (durableConcurrentRequests <= 0.0) durableConcurrentRequests = DEFAULT_DURABLE_CONCURRENT_REQUESTS;
 
-                    durableDrainInterval = obj.GetFloat("durableDrainInterval").GetValueOrDefault(DEFAULT_DURABLE_DRAIN_INTERVAL * ms) / ms;
+                    durableDrainInterval = obj.GetFloat("durableDrainInterval").GetValueOrDefault(DEFAULT_DURABLE_DRAIN_INTERVAL * MILLIS) / MILLIS;
                     if (durableDrainInterval <= 0.0) durableDrainInterval = DEFAULT_DURABLE_DRAIN_INTERVAL;
 
-                    handshakeOffset = obj.GetFloat("handshakeOffset").GetValueOrDefault(DEFAULT_HANDSHAKE_OFFSET * ms) / ms;
+                    handshakeOffset = obj.GetFloat("handshakeOffset").GetValueOrDefault(DEFAULT_HANDSHAKE_OFFSET * MILLIS) / MILLIS;
                     if (handshakeOffset <= 0.0) handshakeOffset = DEFAULT_HANDSHAKE_OFFSET;
                 }
 
                 Seconds ComputeSleepPeriod(int attempt)
                 {
-                    return rng.getNextFloat(0.0f, std::min(retryMax, retryBase * std::pow(2.0f, float(attempt))));
+                    return rng.getNextFloat(0.0f, gsstl::min(retryMax, retryBase * gsstl::pow(2.0f, float(attempt))));
                 }
 
                 Seconds  getRetryBase                () const { return retryBase; }
@@ -98,7 +100,13 @@ namespace GameSparks{ namespace Core {
                 GSClientConfig()
                 :rng(unsigned(clock()))
                 {
-                    setFromObject(GSData()); // set from empty object sets to default values
+                    retryBase = DEFAULT_RETRY_BASE;
+                    retryMax = DEFAULT_RETRY_MAX;
+                    requestTimeout = DEFAULT_REQUEST_TIMEOUT;
+                    durableConcurrentRequests = DEFAULT_DURABLE_CONCURRENT_REQUESTS;
+                    durableDrainInterval = DEFAULT_DURABLE_DRAIN_INTERVAL;
+                    handshakeOffset = DEFAULT_HANDSHAKE_OFFSET;
+
                 }
 
                 // simple linear congruential pseudo random number generator to avoid calling the system RNG and mess up the seed of client code

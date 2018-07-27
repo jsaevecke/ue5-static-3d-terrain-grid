@@ -1,7 +1,7 @@
 #if defined(_DURANGO)
 
 #include "../../System/Exception.hpp"
-#include <iostream>
+//#include <iostream>
 #include "./WebSocketConnection.hpp"
 #include "../Commands/Requests/LoginCommand.hpp"
 #include "../Proto/PositionStream.hpp"
@@ -14,12 +14,12 @@ using namespace System;
 using namespace GameSparks::RT::Commands;
 using namespace Com::Gamesparks::Realtime::Proto;
 
-static std::string build_url(const std::string& remotehost, const std::string& remoteport)
+static gsstl::string build_url(const gsstl::string& remotehost, const gsstl::string& remoteport)
 {
 	return "wss://" + remotehost + ":" + remoteport;
 }
 
-WebSocketConnection::WebSocketConnection(const std::string& remotehost, const std::string& remoteport, IRTSessionInternal* session)
+WebSocketConnection::WebSocketConnection(const gsstl::string& remotehost, const gsstl::string& remoteport, IRTSessionInternal* session)
 :Connection(remotehost, remoteport, session)
 ,client(easywsclient::WebSocket::from_url_binary(build_url(remotehost, remoteport)))
 ,lastReadyState(easywsclient::WebSocket::CLOSED)
@@ -45,7 +45,7 @@ System::Failable<int> WebSocketConnection::Send(const Commands::RTRequest& reque
 		}
 		GS_CATCH(e)
 		{
-			std::clog << e << std::endl;
+			gsstl::clog << e << gsstl::endl;
 			if (session != nullptr && !stopped) {
 				session->SetConnectState(GameSparksRT::ConnectState::Disconnected);
 				session->Log("ReliableConnection", GameSparksRT::LogLevel::LL_DEBUG, e.Format());
@@ -105,7 +105,7 @@ void WebSocketConnection::ConnectCallback()
 	}
 	GS_CATCH(e)
 	{
-		std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+		gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 		if (session != nullptr && !stopped) {
 			session->SetConnectState(GameSparksRT::ConnectState::Disconnected);
 
@@ -136,7 +136,7 @@ void WebSocketConnection::DataReceived(const gsstl::string & message, void* This
 			if (success)
 			{
 				self->OnPacketReceived(p);
-				std::clog << "DataReceived  " << message.size();
+				gsstl::clog << "DataReceived  " << message.size();
 			}
 			else
 			{
@@ -145,7 +145,7 @@ void WebSocketConnection::DataReceived(const gsstl::string & message, void* This
 		}
 		GS_CATCH(e)
 		{
-			std::lock_guard<std::recursive_mutex> lock(self->sessionMutex);
+			gsstl::lock_guard<gsstl::recursive_mutex> lock(self->sessionMutex);
 			if (self->session != nullptr) {
 				self->session->SetConnectState(GameSparksRT::ConnectState::Disconnected);
 

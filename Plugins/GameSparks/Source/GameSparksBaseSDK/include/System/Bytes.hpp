@@ -2,6 +2,7 @@
 #define _SYSTEM_BYTES_HPP_INCLUDED_
 
 #include <vector>
+#include <GameSparks/gsstl.h>
 
 /// commonly used data types
 namespace System {
@@ -9,7 +10,7 @@ namespace System {
 	typedef unsigned char Byte;
 
 	/// a typedef to std::vector<unsigned char>
-	typedef std::vector<Byte> Bytes;
+	typedef gsstl::vector<Byte> Bytes;
 
 } /* namespace System */
 

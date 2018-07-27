@@ -172,7 +172,7 @@ extern "C"
 #include "GameSparks/GSRequest.cpp"
 #include "GameSparks/GSUtil.cpp"
 #include "GameSparks/IGSPlatform.cpp"
-
+#include "GameSparks/gsstl.cpp"
 
 // sources for the RT SDK
 #if !defined(GS_NO_RT_SDK)

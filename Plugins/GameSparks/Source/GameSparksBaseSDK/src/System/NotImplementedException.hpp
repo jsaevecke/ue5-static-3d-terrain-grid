@@ -7,7 +7,7 @@ namespace System {
 
 	class NotImplementedException : public Exception
 	{
-		public: NotImplementedException(const std::string what) : Exception(what, "NotImplementedException") {}
+		public: NotImplementedException(const gsstl::string what) : Exception(what, "NotImplementedException") {}
 	};
 
 } /* namespace System */

@@ -1,15 +1,15 @@
 #ifndef _SYSTEM_THREADING_THREAD_HPP_INCLUDED_
 #define _SYSTEM_THREADING_THREAD_HPP_INCLUDED_
 
-#include <string>
+#include <GameSparks/gsstl.h>
 
 namespace System { namespace Threading {
 
 	class Thread
 	{
 		public:
-		    static void SetName(std::string name);
-			static std::string GetName();
+		    static void SetName(gsstl::string name);
+			static gsstl::string GetName();
 		protected:
 
 		private:

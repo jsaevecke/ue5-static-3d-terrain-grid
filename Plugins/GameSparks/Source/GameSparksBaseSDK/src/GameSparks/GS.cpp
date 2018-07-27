@@ -15,8 +15,8 @@
 #include <GameSparks/GSUtil.h>
 //#include <sstream>
 #include <GameSparks/GSMessage.h>
-#include <cassert>
-#include <ctime>
+//#include <cassert>
+//#include <ctime>
 #include <easywsclient/easywsclient.hpp>
 
 #include <stdio.h>
@@ -761,7 +761,7 @@ gsstl::string GS::SerializeRequestQueue(const t_PersistentQueue& q)
 
 	char* asText = cJSON_Print(list);
 	gsstl::string result(asText);
-	cJSON_free(asText);
+	free(asText);
 	cJSON_Delete(list);
 
 	return result;
@@ -854,7 +854,7 @@ gsstl::string GS::buildServiceUrl(const IGSPlatform* platform)
     #else
 	gsstl::string credential = platform->m_apiCredential.empty() ? "device" : platform->m_apiCredential;
 	gsstl::string apiDomain = platform->m_apiDomain.empty() ? "ws.gamesparks.net" : platform->m_apiDomain;
-
+    
 	if (platform->GetGameSparksSecret().find(':') != gsstl::string::npos)
 	{
 		credential = "secure";

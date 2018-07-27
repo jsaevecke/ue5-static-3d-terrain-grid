@@ -7,7 +7,7 @@ namespace System {
 
 	class ArgumentException : public Exception
 	{
-		public: ArgumentException(const std::string& what) : Exception(what, "ArgumentException") {}
+		public: ArgumentException(const gsstl::string& what) : Exception(what, "ArgumentException") {}
 	};
 
 } /* namespace System */

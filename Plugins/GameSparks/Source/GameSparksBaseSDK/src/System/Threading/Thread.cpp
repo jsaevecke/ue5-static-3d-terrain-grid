@@ -14,7 +14,7 @@
 
 namespace System { namespace Threading {
 
-void Thread::SetName(std::string name) {
+void Thread::SetName(gsstl::string name) {
     #if HAVE_PTHREAD
     //while(name.size() > 15) name.pop_back(); // pthread_setname_np only accepts 16 chars on some platforms
     #if defined(__linux__)
@@ -29,7 +29,7 @@ void Thread::SetName(std::string name) {
     #endif
 }
 
-std::string Thread::GetName() {
+gsstl::string Thread::GetName() {
 #if HAVE_PTHREAD
     char buffer[16];
     pthread_getname_np(

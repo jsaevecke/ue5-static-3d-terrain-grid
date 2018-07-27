@@ -1,7 +1,7 @@
 #ifndef _GAMESPARKSRT_IRTSESSIONINTERNAL_HPP_
 #define _GAMESPARKSRT_IRTSESSIONINTERNAL_HPP_
 
-#include <string>
+//#include <string>
 #include <list>
 #include <vector>
 #include <memory>
@@ -20,7 +20,7 @@ namespace GameSparks { namespace RT {
 			virtual ~IRTSessionInternal(){}
 
 			template <typename T0>
-			void Log (const std::string& tag, GameSparksRT::LogLevel level, const std::string msg, const T0& v0)
+			void Log (const gsstl::string& tag, GameSparksRT::LogLevel level, const gsstl::string msg, const T0& v0)
 			{
 				auto msg_ = msg;
 				replaceAll(msg_, "{0}", to_string(v0));
@@ -28,7 +28,7 @@ namespace GameSparks { namespace RT {
 			}
 
 			template <typename T0, typename T1>
-			void Log (const std::string& tag, GameSparksRT::LogLevel level, const std::string msg, const T0& v0, const T1& v1)
+			void Log (const gsstl::string& tag, GameSparksRT::LogLevel level, const gsstl::string msg, const T0& v0, const T1& v1)
 			{
 				auto msg_ = msg;
 				replaceAll(msg_, "{0}", to_string(v0));
@@ -37,7 +37,7 @@ namespace GameSparks { namespace RT {
 			}
 
             template <typename T0, typename T1, typename T2>
-            void Log (const std::string& tag, GameSparksRT::LogLevel level, const std::string msg, const T0& v0, const T1& v1, const T2& v2)
+            void Log (const gsstl::string& tag, GameSparksRT::LogLevel level, const gsstl::string msg, const T0& v0, const T1& v1, const T2& v2)
             {
                 auto msg_ = msg;
                 replaceAll(msg_, "{0}", to_string(v0));
@@ -46,46 +46,46 @@ namespace GameSparks { namespace RT {
                 this->DoLog(tag, level, msg_);
             }
 
-			void Log (const std::string& tag, GameSparksRT::LogLevel level, const std::string msg)
+			void Log (const gsstl::string& tag, GameSparksRT::LogLevel level, const gsstl::string msg)
 			{
 				DoLog(tag, level, msg);
 			}
 
-			virtual std::string ConnectToken() const =0;
-			virtual void ConnectToken(const std::string&) =0;
-			virtual std::string FastPort() const =0;
-			virtual void FastPort(const std::string&) =0;
+			virtual gsstl::string ConnectToken() const =0;
+			virtual void ConnectToken(const gsstl::string&) =0;
+			virtual gsstl::string FastPort() const =0;
+			virtual void FastPort(const gsstl::string&) =0;
 			virtual void ConnectReliable () =0;
 			virtual void ConnectFast () =0;
 			virtual bool ShouldExecute (int peerId, System::Nullable<int> sequence) = 0;
-			virtual void SubmitAction (std::unique_ptr<IRTCommand>& action) =0;
+			virtual void SubmitAction (gsstl::unique_ptr<IRTCommand>& action) =0;
 			virtual int NextSequenceNumber() = 0;
 
 			virtual void SetConnectState(GameSparksRT::ConnectState value) = 0;
 		private:
-			virtual void DoLog (const std::string& tag, GameSparksRT::LogLevel level, const std::string& msg) = 0;
+			virtual void DoLog (const gsstl::string& tag, GameSparksRT::LogLevel level, const gsstl::string& msg) = 0;
 
-			bool replace(std::string& str, const std::string& from, const std::string& to) {
+			bool replace(gsstl::string& str, const gsstl::string& from, const gsstl::string& to) {
 				size_t start_pos = str.find(from);
-				if(start_pos == std::string::npos)
+				if(start_pos == gsstl::string::npos)
 					return false;
-				str.replace(start_pos, from.length(), to);
+				str.replace(start_pos, from.size(), to);
 				return true;
 			}
 
-			void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+			void replaceAll(gsstl::string& str, const gsstl::string& from, const gsstl::string& to) {
 				if(from.empty())
 					return;
 				size_t start_pos = 0;
-				while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-					str.replace(start_pos, from.length(), to);
-					start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+				while((start_pos = str.find(from, start_pos)) != gsstl::string::npos) {
+					str.replace(start_pos, from.size(), to);
+					start_pos += to.size(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 				}
 			}
 
-			template <typename T> std::string to_string(const T& v) { return System::String::ToString(v); }
-            std::string to_string(const std::string& v) { return v; }
-            std::string to_string(const GameSparksRT::ConnectState& v)
+			template <typename T> gsstl::string to_string(const T& v) { return System::String::ToString(v); }
+            gsstl::string to_string(const gsstl::string& v) { return v; }
+            gsstl::string to_string(const GameSparksRT::ConnectState& v)
             {
                 switch(v)
                 {
@@ -97,7 +97,7 @@ namespace GameSparks { namespace RT {
                     default: return "ERROR_UNKNOWN_CONNECT_STATE";
                 }
             }
-			template <typename T> std::string to_string(const System::Nullable<T>& v)
+			template <typename T> gsstl::string to_string(const System::Nullable<T>& v)
 			{
 				if(!v.HasValue()) return "null";
 				else return System::String::ToString(v.Value());

@@ -5,7 +5,7 @@
 
 namespace GameSparks { namespace RT { namespace Connection {
 
-Connection::Connection (const std::string& remoteHost, const std::string& port, IRTSessionInternal* session_)
+Connection::Connection (const gsstl::string& remoteHost, const gsstl::string& port, IRTSessionInternal* session_)
 :session(session_)
 ,stopped(false)
 {
@@ -49,7 +49,7 @@ System::Failable<void> Connection::OnPacketReceived(Proto::Packet& p)
         if (!p.hasPayload) {
             System::IO::MemoryStream emptyStream;
             GS_ASSIGN_OR_THROW(tmp, CustomCommand::Deserialize(p.OpCode, p.Sender.GetValueOrDefault(0), emptyStream, p.Data, 0, *session));
-            std::unique_ptr<IRTCommand> cmd(tmp);
+            gsstl::unique_ptr<IRTCommand> cmd(tmp);
             session->SubmitAction ( cmd );
         }
     }

@@ -41,11 +41,12 @@
 #include <float.h>
 #include <limits.h>
 #include <ctype.h>
-#include <cmath>
-#include <string>
-#include <clocale>
+//#include <cmath>
+//#include <string>
+//#include <clocale>
 #include <assert.h>
 #include <cjson/cJSON.h>
+#include "../../include/GameSparks/gsstl.h"
 
 namespace GameSparks
 {
@@ -279,12 +280,12 @@ struct ScopedCLocale
 	:category_(category)
 	// ,old_locale(std::setlocale(category, 0))
 	{
-		const char *l = std::setlocale(category, 0);
+		const char *l = setlocale(category, 0);
 		if (l)
 		{
 			old_locale = l;
 		}
-		const char* ret = std::setlocale(category_, "C");
+		const char* ret = setlocale(category_, "C");
 		(void)ret;
 #ifndef __ANDROID__
 		assert(ret); // null means, that setting the locale failed.
@@ -293,12 +294,12 @@ struct ScopedCLocale
 
 	~ScopedCLocale()
 	{
-		std::setlocale(category_, old_locale.c_str());
+		setlocale(category_, old_locale.c_str());
 	}
 
 	private:
 		int category_;
-		std::string old_locale;
+		gsstl::string old_locale;
 };
 
 /* Parse an object - create a new root, and populate. */

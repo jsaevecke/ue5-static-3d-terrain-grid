@@ -2,10 +2,11 @@
 #define _SYSTEM_ACTION_HPP_INCLUDED_
 
 #include <functional>
+#include <GameSparks/gsstl.h>
 
 namespace System {
 
-	typedef std::function<void ()> Action;
+	typedef gsstl::function<void ()> Action;
 
 } /* namespace System */
 

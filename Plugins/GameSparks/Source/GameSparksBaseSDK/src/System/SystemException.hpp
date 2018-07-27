@@ -7,8 +7,8 @@ namespace System {
 
 	class SystemException : public Exception
 	{
-		public: SystemException(const std::string what) : Exception(what, "System.SystemException") {}
-		public: SystemException(const std::string what, const std::string typeName) : Exception(what, typeName) {}
+		public: SystemException(const gsstl::string what) : Exception(what, "System.SystemException") {}
+		public: SystemException(const gsstl::string what, const gsstl::string typeName) : Exception(what, typeName) {}
 	};
 
 } /* namespace System */

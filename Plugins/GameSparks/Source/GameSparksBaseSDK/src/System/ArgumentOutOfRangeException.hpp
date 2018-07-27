@@ -8,7 +8,7 @@ namespace System {
 	class ArgumentOutOfRangeException : public ArgumentException
 	{
 		public:
-			ArgumentOutOfRangeException(const std::string& message)
+			ArgumentOutOfRangeException(const gsstl::string& message)
 			:ArgumentException(message) {}
 	};
 

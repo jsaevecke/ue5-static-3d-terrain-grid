@@ -145,7 +145,7 @@ namespace GameSparks
 				template <typename F>
 				auto accessPersistentStorage(F&& f)
 				{
-					std::lock_guard<std::mutex> lock(persistentStorageMutex);
+					gsstl::lock_guard<gsstl::mutex> lock(persistentStorageMutex);
 					return f(persistentStorage);
 				}
 				#endif
@@ -205,7 +205,7 @@ namespace GameSparks
 				bool m_dontRetryAfterDisconnect;
 
 				#if GS_USE_IN_MEMORY_PERSISTENT_STORAGE
-				std::mutex persistentStorageMutex;
+				gsstl::mutex persistentStorageMutex;
 				PersistentStorage persistentStorage;
 				#endif
            	private:

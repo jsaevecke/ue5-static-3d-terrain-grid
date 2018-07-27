@@ -121,7 +121,7 @@ namespace System {
 
 #define GS_PROGRAMMING_ERROR(message) \
 	assert(false); \
-	std::clog << "Programming Error: " << message << std::endl;
+	gsstl::clog << "Programming Error: " << message << gsstl::endl;
 
 
 /*!
@@ -150,7 +150,7 @@ GS_CATCH(e)
  /// Note: as this is using a do/while loop behind the curtain, you need to be extra careful with nesting loops inside a
  /// GS_TRY / GS_CATCH construct.
 #define GS_TRY \
-std::unique_ptr<System::Exception> exception; \
+gsstl::unique_ptr<System::Exception> exception; \
 for(int GS_UNIQUE_IDENTIFIER(result, __LINE__) = 0; GS_UNIQUE_IDENTIFIER(result, __LINE__) != 1; ++GS_UNIQUE_IDENTIFIER(result, __LINE__))
 
 
@@ -167,7 +167,7 @@ if(exception)
 
 #define GS_PASS_EXCEPTION_TO_CATCH(expression) \
 {\
-        exception = std::unique_ptr<System::Exception>(new System::Exception(expression)); \
+        exception = gsstl::unique_ptr<System::Exception>(new System::Exception(expression)); \
         exception->PushFrame(__FILE__, __LINE__, __func__); \
         continue; \
 }

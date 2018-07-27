@@ -2,7 +2,7 @@
 #define _GAMESPARKSRT_LOGINCOMMAND_HPP_
 
 #include "./RTRequest.hpp"
-#include <string>
+//#include <string>
 #include "../../Proto/ProtocolParser.hpp"
 
 namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
@@ -10,9 +10,9 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 	class LoginCommand : public ::GameSparks::RT::Commands::RTRequest
 	{
 		public:
-			LoginCommand(const std::string connectToken);
+			LoginCommand(const gsstl::string connectToken);
 			virtual System::Failable<void> Serialize (System::IO::Stream& stream) const override;
-			const std::string Token;
+			const gsstl::string Token;
 			const int ClientVersion;
 		private:
 			static System::Failable<void> Serialize(System::IO::Stream& stream, const LoginCommand& instance);

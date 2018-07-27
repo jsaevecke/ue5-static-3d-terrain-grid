@@ -60,7 +60,7 @@ namespace System { namespace IO {
                 }
                 if (mustZero)
                 {
-                    std::fill(_buffer.begin() + _length, _buffer.end(), 0);
+                    gsstl::fill(_buffer.begin() + _length, _buffer.end(), 0);
                     //Array.Clear(_buffer, _length, _position - _length);
                 }
                 _length = newLength;
@@ -106,7 +106,7 @@ namespace System { namespace IO {
                 }
                 if (mustZero)
                 {
-                    std::fill(_buffer.begin() + _length, _buffer.end(), 0);
+                    gsstl::fill(_buffer.begin() + _length, _buffer.end(), 0);
                     //Array.Clear(_buffer, _length, i - _length);
                 }
                 _length = i;
@@ -121,7 +121,7 @@ namespace System { namespace IO {
             }
             else
             {
-                std::copy(
+                gsstl::copy(
                     buffer.begin()+offset, buffer.begin()+offset+count,
                     _buffer.begin()+_position
                 );
@@ -174,7 +174,7 @@ namespace System { namespace IO {
                     buffer[offset + byteCount] = _buffer[_position + byteCount];
             }
             else
-                std::copy(
+                gsstl::copy(
                     _buffer.begin() + _position, _buffer.begin() + _position + n,
                     buffer.begin() + offset
                 );

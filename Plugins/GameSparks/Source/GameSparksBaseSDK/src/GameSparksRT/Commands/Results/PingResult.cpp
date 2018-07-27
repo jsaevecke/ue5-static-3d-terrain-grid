@@ -8,7 +8,7 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 
 System::Failable<PingResult*> PingResult::Deserialize(System::IO::Stream& stream)
 {
-    std::unique_ptr<PingResult> instance(new PingResult());
+    gsstl::unique_ptr<PingResult> instance(new PingResult());
 
 	for (;;)
     {

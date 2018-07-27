@@ -67,7 +67,7 @@ namespace System { namespace Net { namespace Sockets {
 			AsyncCallback receiveCallback;
 			System::Bytes* receiveBuffer = nullptr;
 
-			std::thread connectThread; // for name resolution and connect()
+			gsstl::thread connectThread; // for name resolution and connect()
 			volatile bool isInsideInternalRecv;
 			void teardown();
 		private:

@@ -1,7 +1,7 @@
 #ifndef _GAMESPARKSRT_CONNECTION_HPP_
 #define _GAMESPARKSRT_CONNECTION_HPP_
 
-#include <string>
+//#include <string>
 #include <mutex>
 #include "../IRTSessionInternal.hpp"
 #include "../../System/Net/IPEndPoint.hpp"
@@ -16,7 +16,7 @@ namespace GameSparks { namespace RT { namespace Connection {
 	class Connection
 	{
 		public:
-			Connection (const std::string& remoteHost, const std::string& port, IRTSessionInternal* session);
+			Connection (const gsstl::string& remoteHost, const gsstl::string& port, IRTSessionInternal* session);
 			virtual ~Connection() {}
 			virtual System::Failable<int> Send(const Commands::RTRequest &request) =0;
 
@@ -30,7 +30,7 @@ namespace GameSparks { namespace RT { namespace Connection {
 
 			System::Net::IPEndPoint remoteEndPoint;
 			IRTSessionInternal* session;
-			std::recursive_mutex sessionMutex;
+			gsstl::recursive_mutex sessionMutex;
 			volatile bool stopped;
 		private:
 	};

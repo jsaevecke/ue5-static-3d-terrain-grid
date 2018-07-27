@@ -10,7 +10,7 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 
 System::Failable<UDPConnectMessage*> UDPConnectMessage::Deserialize(System::IO::Stream& stream)
 {
-    std::unique_ptr<UDPConnectMessage> instance(new UDPConnectMessage());
+    gsstl::unique_ptr<UDPConnectMessage> instance(new UDPConnectMessage());
 
 	for (;;)
     {

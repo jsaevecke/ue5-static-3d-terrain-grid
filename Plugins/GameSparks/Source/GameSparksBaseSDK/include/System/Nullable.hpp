@@ -1,11 +1,12 @@
 #ifndef _SYSTEM_NULLABLE_HPP_
 #define _SYSTEM_NULLABLE_HPP_
 
-#include <utility>
-#include <algorithm>
-#include <cassert>
-#include <ostream>
+//#include <utility>
+//#include <algorithm>
+//#include <cassert>
+//#include <ostream>
 #include "../GameSparksRT/GSLinking.hpp"
+#include "../GameSparks/gsstl.h"
 
 namespace System {
 
@@ -65,7 +66,7 @@ namespace System {
 
             friend void swap(Nullable& a, Nullable& b)
             {
-                using std::swap;
+                using gsstl::swap;
                 swap(a.val, b.val);
             }
 
@@ -123,7 +124,7 @@ namespace System {
             }*/
 
             /// ostream operator for debug output.
-            friend std::ostream& operator << (std::ostream& os, const Nullable<T>& n)
+            friend gsstl::ostream& operator << (gsstl::ostream& os, const Nullable<T>& n)
             {
                 if(!n.HasValue()) os << "(null)";
                 else os << n.Value();

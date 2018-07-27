@@ -24,8 +24,8 @@ IRTSessionListener::~IRTSessionListener(){
 }
 
 
-RTSessionImpl::RTSessionImpl(const std::string &connectToken_, const std::string &hostName_,
-                             const std::string &tcpPort_, const std::string &udpPort_)
+RTSessionImpl::RTSessionImpl(const gsstl::string &connectToken_, const gsstl::string &hostName_,
+                             const gsstl::string &tcpPort_, const gsstl::string &udpPort_)
 :connectionAttempts(1)
 ,connectToken(connectToken_)
 ,hostName(hostName_)
@@ -50,7 +50,7 @@ RTSessionImpl::~RTSessionImpl()
 
 
 int RTSessionImpl::SendData(int opCode, GameSparksRT::DeliveryIntent intent, const System::Bytes &payload,
-                            const RTData &data, const std::vector<int> &targetPlayers)
+                            const RTData &data, const gsstl::vector<int> &targetPlayers)
 {
     if(!payload.empty())
     {
@@ -65,7 +65,7 @@ int RTSessionImpl::SendData(int opCode, GameSparksRT::DeliveryIntent intent, con
 
 
 int RTSessionImpl::SendRTData(int opCode, GameSparksRT::DeliveryIntent deliveryIntent, const RTData &data,
-                              const std::vector<int> &targetPlayers)
+                              const gsstl::vector<int> &targetPlayers)
 {
     System::Bytes dummy;
     return SendRTDataAndBytes (opCode, deliveryIntent, dummy, data, targetPlayers);
@@ -73,7 +73,7 @@ int RTSessionImpl::SendRTData(int opCode, GameSparksRT::DeliveryIntent deliveryI
 
 int RTSessionImpl::SendBytes(int opCode, GameSparksRT::DeliveryIntent deliveryIntent,
                              const System::ArraySegment<System::Byte> &payload,
-                             const std::vector<int> &targetPlayers)
+                             const gsstl::vector<int> &targetPlayers)
 {
     RTData dummy;
     return SendRTDataAndBytes (opCode, deliveryIntent, payload, dummy, targetPlayers);
@@ -82,7 +82,7 @@ int RTSessionImpl::SendBytes(int opCode, GameSparksRT::DeliveryIntent deliveryIn
 
 int RTSessionImpl::SendRTDataAndBytes(int opCode, GameSparksRT::DeliveryIntent intent,
                                       const System::ArraySegment<System::Byte> &payload, const RTData &data,
-                                      const std::vector<int> &targetPlayers)
+                                      const gsstl::vector<int> &targetPlayers)
 {
     if(opCode == 0)
     {
@@ -96,7 +96,7 @@ int RTSessionImpl::SendRTDataAndBytes(int opCode, GameSparksRT::DeliveryIntent i
 		#if !GS_RT_OVER_WS
         if(intent != GameSparksRT::DeliveryIntent::RELIABLE && GetConnectState() >= GameSparksRT::ConnectState::ReliableAndFastSend )
         {
-            std::lock_guard<std::recursive_mutex> lock(sendMutex);
+            gsstl::lock_guard<gsstl::recursive_mutex> lock(sendMutex);
             if(fastConnection)
             {
                 GS_RETURN_RESULT_OR_CATCH(fastConnection->Send(csr));
@@ -110,7 +110,7 @@ int RTSessionImpl::SendRTDataAndBytes(int opCode, GameSparksRT::DeliveryIntent i
         else
 		#endif
 		{
-            std::lock_guard<std::recursive_mutex> lock(sendMutex);
+            gsstl::lock_guard<gsstl::recursive_mutex> lock(sendMutex);
             if(reliableConnection && GetConnectState() >= GameSparksRT::ConnectState::ReliableOnly)
             {
                 GS_RETURN_RESULT_OR_CATCH(reliableConnection->Send(csr));
@@ -135,7 +135,7 @@ void RTSessionImpl::Stop() {
     running = false;
     Ready = false;
 
-    std::lock_guard<std::recursive_mutex> lock(sendMutex);
+    gsstl::lock_guard<gsstl::recursive_mutex> lock(sendMutex);
 
 	#if !GS_RT_OVER_WS
 	if(fastConnection)
@@ -170,13 +170,13 @@ void RTSessionImpl::CheckConnection(){
 
         if(
             !isConnected &&
-            std::chrono::steady_clock::now() > mustConnnectBy
+            gsstl::chrono::steady_clock::now() > mustConnnectBy
         )
         {
             SetConnectState(GameSparksRT::ConnectState::Disconnected);
             Log("IRTSession", GameSparksRT::LogLevel::LL_INFO, "Not connected in time, retrying");
 
-            std::lock_guard<std::recursive_mutex> lock(sendMutex);
+            gsstl::lock_guard<gsstl::recursive_mutex> lock(sendMutex);
             if(reliableConnection){
                 reliableConnection->StopInternal();
                 reliableConnection.reset(nullptr);
@@ -206,48 +206,48 @@ void RTSessionImpl::Update() {
     if(running)
         CheckConnection();
 
-    while(std::unique_ptr<IRTCommand> toExecute = GetNextAction())
+    while(gsstl::unique_ptr<IRTCommand> toExecute = GetNextAction())
     {
         toExecute->Execute ();
     }
 
-    std::lock_guard<std::recursive_mutex> lock(sendMutex);
+    gsstl::lock_guard<gsstl::recursive_mutex> lock(sendMutex);
     if(reliableConnection)
     {
         reliableConnection->Poll();
     }
 }
 
-void RTSessionImpl::DoLog(const std::string &tag, GameSparks::RT::GameSparksRT::LogLevel level, const std::string &msg) {
+void RTSessionImpl::DoLog(const gsstl::string &tag, GameSparks::RT::GameSparksRT::LogLevel level, const gsstl::string &msg) {
     if(GameSparksRT::ShouldLog(tag, level))
     {
-        std::unique_ptr<IRTCommand> cmd(new LogCommand(tag, level, msg));
+        gsstl::unique_ptr<IRTCommand> cmd(new LogCommand(tag, level, msg));
         SubmitAction(cmd);
     }
 }
 
-std::string RTSessionImpl::ConnectToken() const {
+gsstl::string RTSessionImpl::ConnectToken() const {
     return connectToken;
 }
 
-void RTSessionImpl::ConnectToken(const std::string& token)
+void RTSessionImpl::ConnectToken(const gsstl::string& token)
 {
     connectToken = token;
 }
 
-std::string RTSessionImpl::FastPort() const
+gsstl::string RTSessionImpl::FastPort() const
 {
     return fastPort;
 }
 
-void RTSessionImpl::FastPort(const std::string& port)
+void RTSessionImpl::FastPort(const gsstl::string& port)
 {
     fastPort = port;
 }
 
 
 void RTSessionImpl::ConnectReliable() {
-    mustConnnectBy = std::chrono::steady_clock::now() + std::chrono::milliseconds(int(1000.0f*GameSparks::Core::GSClientConfig::instance().ComputeSleepPeriod(connectionAttempts++)));
+    mustConnnectBy = gsstl::chrono::steady_clock::now() + gsstl::chrono::milliseconds(int(1000.0f*GameSparks::Core::GSClientConfig::instance().ComputeSleepPeriod(connectionAttempts++)));
 	#if GS_RT_OVER_WS
 	reliableConnection.reset(new Connection::WebSocketConnection(hostName, TcpPort, this));
 	#else
@@ -279,15 +279,15 @@ bool RTSessionImpl::ShouldExecute(int peerId, System::Nullable<int> sequence) {
     }
 }
 
-void RTSessionImpl::SubmitAction(std::unique_ptr<IRTCommand>& action) {
-    std::lock_guard<std::mutex> lock(actionQueueMutex);
-    actionQueue.push(std::move(action));
+void RTSessionImpl::SubmitAction(gsstl::unique_ptr<IRTCommand>& action) {
+    gsstl::lock_guard<gsstl::mutex> lock(actionQueueMutex);
+    actionQueue.push(gsstl::move(action));
 }
 
-std::unique_ptr<IRTCommand> RTSessionImpl::GetNextAction() {
-    std::lock_guard<std::mutex> lock(actionQueueMutex);
+gsstl::unique_ptr<IRTCommand> RTSessionImpl::GetNextAction() {
+    gsstl::lock_guard<gsstl::mutex> lock(actionQueueMutex);
     if (!actionQueue.empty()) {
-        auto ret = std::move(actionQueue.front());
+        auto ret = gsstl::move(actionQueue.front());
         actionQueue.pop();
         return ret;
     }
@@ -319,7 +319,7 @@ void RTSessionImpl::OnPlayerDisconnect(int peerId) {
 void RTSessionImpl::OnReady(bool ready) {
     if(!this->Ready && ready){
         SendData (Commands::OpCodes::PlayerReadyMessage, GameSparksRT::DeliveryIntent::RELIABLE, {}, {}, {});
-        if(PeerId.HasValue() && std::find(ActivePeers.begin(), ActivePeers.end(), PeerId.Value()) == ActivePeers.end()){
+        if(PeerId.HasValue() && gsstl::find(ActivePeers.begin(), ActivePeers.end(), PeerId.Value()) == ActivePeers.end()){
             ActivePeers.push_back(PeerId.Value());
         }
     }
@@ -330,14 +330,14 @@ void RTSessionImpl::OnReady(bool ready) {
     }
 
     if (SessionListener != nullptr) {
-        std::unique_ptr<IRTCommand> cmd(new ActionCommand([this, ready](){
+        gsstl::unique_ptr<IRTCommand> cmd(new ActionCommand([this, ready](){
             if(this->SessionListener != nullptr)
             {
                 SessionListener->OnReady(ready);
             }
             else
             {
-                std::clog << "INFO: SessionListener was unregistered" << std::endl;
+                gsstl::clog << "INFO: SessionListener was unregistered" << gsstl::endl;
             }
         }));
         SubmitAction (cmd);

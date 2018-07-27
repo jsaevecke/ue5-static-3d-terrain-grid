@@ -10,16 +10,19 @@
 #include <mbedtls/error.h>
 #include <mbedtls/platform.h>
 #include <mbedtls/debug.h>
-#include <cassert>
-#include <cstdio>
+//#include <cassert>
+//#include <cstdio>
+//#include <iostream>
 
 #include <GameSparks/GSLeakDetector.h>
-#include "./CertificateStore.hpp"
+#include <GameSparks/gsstl.h>
+
+#include <easywsclient/CertificateStore.hpp>
 
 //test
 #include <GameSparks/GSUtil.h>
-#	include <iostream>
-#	include <string.h>
+//#include <iostream>
+//#include <string.h>
 
 #if defined(WIN32) && !defined(snprintf)
 #   define snprintf _snprintf_s
@@ -27,14 +30,13 @@
 
 // use std::thread in MSVC11 (2012) or newer
 #if (((defined(_MSC_VER) && _MSC_VER >= 1700) || __cplusplus >= 201103L) && !defined(IW_SDK))
-#	include <thread>
-#	include <mutex>
+//#	include <thread>
+//#	include <mutex>
 #	define USE_STD_THREAD 1
 #else
 #	include <pthread.h>    /* POSIX Threads */
 #	undef USE_STD_THREAD
 #endif /* WIN32 */
-
 
 namespace { // private module-only namespace
 
@@ -42,8 +44,8 @@ namespace { // private module-only namespace
 	{
 		typedef void *(*start_routine) (void *);
 
-		#ifdef USE_STD_THREAD
-			typedef std::mutex mutex;
+#ifdef USE_STD_THREAD
+			typedef gsstl::mutex mutex;
 
 			void mutex_init(mutex&)
 			{
@@ -60,7 +62,7 @@ namespace { // private module-only namespace
 				mtx.unlock();
 			}
 
-			typedef std::thread thread;
+			typedef gsstl::thread thread;
 
 			void thread_create(thread& t, start_routine f, void* arg)
 			{
@@ -81,7 +83,7 @@ namespace { // private module-only namespace
 			{
 				return t.joinable();
 			}
-		#else
+#else
 			typedef pthread_mutex_t mutex;
 
 			void mutex_init(mutex& mutex)
@@ -124,7 +126,7 @@ namespace { // private module-only namespace
 			{
 				return t != 0;
 			}
-		#endif
+#endif
 	}
 
 	class BaseSocket
@@ -425,12 +427,14 @@ namespace { // private module-only namespace
 		gsstl::vector<char> rxbuf;
 		gsstl::vector<char> txbuf;
 
-		threading::thread dns_thread;
 		volatile readyStateValues readyState;
         bool useMask;
 		BaseSocket* socket;
 
-		threading::mutex lock;
+#if !((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
+        threading::thread dns_thread;
+        threading::mutex lock;
+#endif
 
         _RealWebSocket(gsstl::string host, gsstl::string path, int port, gsstl::string url, gsstl::string origin, bool _useMask, bool _useSSL)
         {
@@ -453,12 +457,17 @@ namespace { // private module-only namespace
         
         virtual ~_RealWebSocket()
         {
+#if ((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
+            socket->abort();
+            delete socket;
+#else
 			if (threading::thread_is_joinable(dns_thread))
 			{
                 socket->abort();
 				threading::thread_join(dns_thread);
+				delete socket;
 			}
-            delete socket;
+#endif
         }
 
 		readyStateValues getReadyState() const {
@@ -477,10 +486,24 @@ namespace { // private module-only namespace
             {
                 if(ipLookup == keComplete)
                 {
+#if ((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
+                    assert(socket);
+                    GS_CODE_TIMING_ASSERT();
+                    // establish the ssl connection and do websocket handshaking
+                    if (!socket->connect(m_host.c_str(), static_cast<short>(m_port)) || !doConnect2(errorCallback, userData))
+                    {
+                        GS_CODE_TIMING_ASSERT();
+                        forceClose();
+                    }
+                    else
+                    {
+                        readyState = OPEN;
+                    }
+#else
 					// join the dns_thread
 					threading::thread_join(dns_thread);
 
-					#if defined(IW_SDK) // on marmalade, we're doing the TLS-Handshake blocking to avoid multithreaded memory management issues
+                    #if defined(IW_SDK) // on marmalade, we're doing the TLS-Handshake blocking to avoid multithreaded memory management issues
 					assert(socket);
 					GS_CODE_TIMING_ASSERT();
 					// establish the ssl connection and do websocket handshaking
@@ -496,10 +519,13 @@ namespace { // private module-only namespace
 					#else
 					readyState = OPEN;
 					#endif
+#endif
                 }
                 else if( ipLookup == keFailed )
                 {
+#if !((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
 					threading::thread_join(dns_thread);
+#endif
                     forceClose();
 					using namespace easywsclient;
 
@@ -798,12 +824,14 @@ namespace { // private module-only namespace
 
 			assert(self->socket);
 
+#if !((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
 			threading::mutex_lock(self->lock);
+#endif
 
-			#if defined(IW_SDK)
+#if defined(IW_SDK) || ((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
 			// here we're calling TCPSocket::connect, because we only want to to dns lookup and the initial connect in this thread.
 			// no TLS/SSL handshake is performed just yet. This is because we cannot allocate memory on platforms like marmalade in a different thread.
-			if (!((TCPSocket*)(self->socket))->TCPSocket::connect(self->m_host.c_str(), static_cast<short>(self->m_port)))
+			if (!self->socket->connect(self->m_host.c_str(), static_cast<short>(self->m_port)))
             {
                 assert(self->socket);
                 self->ipLookupError = easywsclient::WSError(easywsclient::WSError::CONNECT_FAILED, self->socket->get_error_string());
@@ -813,7 +841,7 @@ namespace { // private module-only namespace
             {
                 self->ipLookup = keComplete;
             }
-			#else
+#else
 			// Note: we're passing nullptr to doConnect2() - those callbacks are called in poll()
 			if (!self->socket->connect(self->m_host.c_str(), static_cast<short>(self->m_port)) || !self->doConnect2(dns_lookup_thread_error_dispatcher, self))
 			{
@@ -828,10 +856,12 @@ namespace { // private module-only namespace
 			{
 				self->ipLookup = keComplete;
 			}
-			#endif
+#endif
             
+#if !((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
 			threading::mutex_unlock(self->lock);
 			threading::thread_exit(self->dns_thread);
+#endif
 
 			return 0;
         }
@@ -842,17 +872,21 @@ namespace { // private module-only namespace
             ipLookup = keInprogress;
 			ipLookupError = easywsclient::WSError();
 
+#if ((GS_TARGET_PLATFORM == GS_PLATFORM_IOS || GS_TARGET_PLATFORM == GS_PLATFORM_MAC) && defined(__UNREAL__))
+            _s_dns_Lookup((void*)this);
+#else
 			threading::mutex_init(lock);
 			threading::thread_create(dns_thread, _s_dns_Lookup, (void*)this);
-
+#endif
+            
             return true;
         }
         
 		bool doConnect2(WSErrorCallback errorCallback, void* userData)
         {
-			#if defined(IW_SDK) // on non-marmalade, this is called from a background-thread
-				GS_CODE_TIMING_ASSERT();
-			#endif
+#if defined(IW_SDK) // on non-marmalade, this is called from a background-thread
+            GS_CODE_TIMING_ASSERT();
+#endif
 
 			using namespace easywsclient;
 
@@ -993,8 +1027,6 @@ namespace { // private module-only namespace
 	}
 } // end of module-only namespace
 
-
-
 namespace easywsclient {
 	WebSocket::pointer WebSocket::from_url(const gsstl::string& url, const gsstl::string& origin) {
 		return ::from_url(url, true, origin);
@@ -1005,4 +1037,4 @@ namespace easywsclient {
 	}
 } // namespace easywsclient
 
-#endif /* _DURANGO */
+#endif

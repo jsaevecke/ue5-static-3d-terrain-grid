@@ -21,13 +21,13 @@ static bool IndexIsValid(uint index)
 {
     if(index < 1)
     {
-        std::cerr << "RTData field index must be greater than zero." << std::endl;
+        gsstl::cerr << "RTData field index must be greater than zero." << gsstl::endl;
         return false;
     }
 
     if(index >= GameSparksRT::MAX_RTDATA_SLOTS)
     {
-        std::cerr << "RTData field index must be less than " << GameSparksRT::MAX_RTDATA_SLOTS << "." << std::endl;
+        gsstl::cerr << "RTData field index must be less than " << GameSparksRT::MAX_RTDATA_SLOTS << "." << gsstl::endl;
         return false;
     }
 
@@ -61,7 +61,7 @@ System::Nullable<double> RTData::GetDouble(uint index) const {
     return data[index].double_val;
 }
 
-System::Nullable<std::string> RTData::GetString(uint index) const {
+System::Nullable<gsstl::string> RTData::GetString(uint index) const {
     if(!IndexIsValid(index)) return {};
     return data[index].string_val;
 }
@@ -101,7 +101,7 @@ RTData &RTData::SetDouble(uint index, double value) {
     return *this;
 }
 
-RTData &RTData::SetString(uint index, const std::string &value) {
+RTData &RTData::SetString(uint index, const gsstl::string &value) {
     if(!IndexIsValid(index)) return *this;
     data[index] = RTVal(value);
     return *this;
@@ -113,7 +113,7 @@ RTData &RTData::SetData(uint index, const RTData &value) {
     return *this;
 }
 
-std::ostream& operator << (std::ostream& os, const RTVector& p)
+gsstl::ostream& operator << (gsstl::ostream& os, const RTVector& p)
 {
     os << "(";
     if(p.x.HasValue()) os << "x=" << p.x.Value() << ", ";
@@ -125,7 +125,7 @@ std::ostream& operator << (std::ostream& os, const RTVector& p)
 }
 
 
-GS_API std::ostream &operator<<(std::ostream &os, const RTData &p) {
+GS_API gsstl::ostream &operator<<(gsstl::ostream &os, const RTData &p) {
     os << " {";
 
     auto i=0;

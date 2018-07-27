@@ -3,7 +3,7 @@
 #include "../../../../include/mbedtls/error.h"
 #include "../../../../include/mbedtls/platform.h"
 #include "../../ObjectDisposedException.hpp"
-#include "../../../easywsclient/CertificateStore.hpp"
+#include "../../../../include/easywsclient/CertificateStore.hpp"
 
 namespace System { namespace Net { namespace Sockets {
 	TLSSocket::TLSSocket(AddressFamily addressFamily)
@@ -27,12 +27,12 @@ namespace System { namespace Net { namespace Sockets {
 		mbedtls_entropy_free(&entropy);
 	}
 
-	static void set_errstr(const std::string& e)
+	static void set_errstr(const gsstl::string& e)
 	{
-		std::cerr << "TLS socket Error: " << e << std::endl;
+		gsstl::cerr << "TLS socket Error: " << e << gsstl::endl;
 	}
 
-	static std::string mbedtls_error_to_string_2(int result)
+	static gsstl::string mbedtls_error_to_string_2(int result)
 	{
 		assert(result < 0); // you cannot translate an error that is none.
 
@@ -153,7 +153,7 @@ namespace System { namespace Net { namespace Sockets {
 
 		if (result < 0)
 		{
-			GS_THROW(System::ObjectDisposedException("Socket has closed or read error:" + std::string(mbedtls_error_to_string_2(result))));
+			GS_THROW(System::ObjectDisposedException("Socket has closed or read error:" + gsstl::string(mbedtls_error_to_string_2(result))));
 		}
 		if (result == 0)
 		{
@@ -172,7 +172,7 @@ namespace System { namespace Net { namespace Sockets {
 
 		if (ret < 0)
 		{
-			GS_THROW(ObjectDisposedException("Socket has closed or read error:" + std::string(mbedtls_error_to_string_2(ret))));
+			GS_THROW(ObjectDisposedException("Socket has closed or read error:" + gsstl::string(mbedtls_error_to_string_2(ret))));
 		}
 		return{};
 	}

@@ -7,7 +7,7 @@ namespace System { namespace IO {
 
 	class EndOfStreamException : public Exception
 	{
-		public: EndOfStreamException(const std::string what) : Exception(what, "EndOfStreamException") {}
+		public: EndOfStreamException(const gsstl::string what) : Exception(what, "EndOfStreamException") {}
 	};
 
 }} /* namespace System.IO */

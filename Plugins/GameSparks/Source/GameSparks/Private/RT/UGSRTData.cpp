@@ -2,7 +2,7 @@
 #include "../GameSparksPrivatePCH.h"
 #include "Engine.h"
 #include "GameSparksClasses.h"
-#include <sstream>
+//#include <sstream>
 
 DECLARE_LOG_CATEGORY_EXTERN(UGameSparksRTDataLog, Log, All);
 DEFINE_LOG_CATEGORY(UGameSparksRTDataLog);
@@ -163,7 +163,7 @@ UGSRTData* UGSRTData::SetData(int32 index, UGSRTData* value)
 
 FString UGSRTData::ToString()
 {
-	std::stringstream ss;
+	gsstl::stringstream ss;
 	ss << m_Data;
 	return FString(UTF8_TO_TCHAR(ss.str().c_str()));
 }

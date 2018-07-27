@@ -5,7 +5,7 @@
 #include "GameSparksModule.h"
 
 #include "Runtime/Launch/Resources/Version.h"
-#include <sstream>
+//#include <sstream>
 
 #if !defined(GS_MAKE_VERSION)
 #   define GS_MAKE_VERSION(major, minor) (major*100 + minor)
@@ -55,7 +55,7 @@ namespace GameSparks
 
 			gsstl::string GetEngineVersion() const override
 			{
-				std::stringstream ss;
+				gsstl::stringstream ss;
 				ss << ENGINE_MAJOR_VERSION << "." << ENGINE_MINOR_VERSION << "." << ENGINE_PATCH_VERSION;
 				return ss.str();
 			}
@@ -93,6 +93,7 @@ namespace GameSparks
                     #endif
                     writeableLocation += "gamesparks_";
                     writeableLocation += FString(UTF8_TO_TCHAR(desired_name.c_str()));
+                
                     return TCHAR_TO_UTF8(*writeableLocation);
 				#endif
             }

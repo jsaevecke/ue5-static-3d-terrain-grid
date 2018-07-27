@@ -1,6 +1,8 @@
 #ifndef GAMESPAKS_CERTIFICATE_STORE_HPP
 #define GAMESPAKS_CERTIFICATE_STORE_HPP
 
+#include "GameSparks/GSPlatformDeduction.h"
+
 #if defined(WIN32)
 #	include <Windows.h>
 #	if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -30,10 +32,11 @@ namespace GameSparks { namespace Util {
                 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 					// Wincrypt appears to be not implemented for non-desktop apps
 					static bool initialized = false;
+					static char errormsg[256];
 					static mbedtls_x509_crt cacert;
 					static mbedtls_x509_crl crl;
-					static std::mutex mutex;
-					std::lock_guard<std::mutex> guard(mutex);
+					static gsstl::mutex mutex;
+					gsstl::lock_guard<gsstl::mutex> guard(mutex);
 
 					if (!initialized)
 					{
@@ -61,7 +64,7 @@ namespace GameSparks { namespace Util {
 							assert(cs);
 							if (!cs)
 							{
-								return false;
+								return -1;
 							}
 
 							for (
@@ -71,9 +74,11 @@ namespace GameSparks { namespace Util {
 								)
 							{
 								int res = mbedtls_x509_crt_parse(&cacert, ctx->pbCertEncoded, ctx->cbCertEncoded);
+						
 								if (res != 0)
 								{
-									return res;
+									mbedtls_strerror(res, errormsg, sizeof(errormsg));
+									mbedtls_fprintf(stderr, "%s\n", errormsg);
 								}
 							}
 
@@ -84,9 +89,11 @@ namespace GameSparks { namespace Util {
 								)
 							{
 								int res = mbedtls_x509_crl_parse(&crl, ctx->pbCrlEncoded, ctx->cbCrlEncoded);
+
 								if (res != 0)
 								{
-									return res;
+									mbedtls_strerror(res, errormsg, sizeof(errormsg));
+									mbedtls_fprintf(stderr, "%s\n", errormsg);
 								}
 							}
 

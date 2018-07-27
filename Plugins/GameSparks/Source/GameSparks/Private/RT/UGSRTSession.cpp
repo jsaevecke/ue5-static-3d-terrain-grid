@@ -30,7 +30,7 @@ UGSRTSession* UGSRTSession::CreateRTSession(UObject* WorldContextObject, FString
 
 void UGSRTSession::Start()
 {
-	std::lock_guard<std::recursive_mutex > lock(sessionMutex);
+	gsstl::lock_guard<gsstl::recursive_mutex > lock(sessionMutex);
 	if (session)
 	{
 		session->Start();
@@ -41,7 +41,7 @@ void UGSRTSession::Start()
 
 void UGSRTSession::Stop()
 {
-	std::lock_guard<std::recursive_mutex > lock(sessionMutex);
+	gsstl::lock_guard<gsstl::recursive_mutex > lock(sessionMutex);
 	if (session)
 	{
 		started = false;
@@ -64,8 +64,8 @@ void UGSRTSession::Send(int32 opCode, DeliveryIntent intent, UGSRTData* data, TA
 		return;
 	}
 
-	std::vector<int> peerIds(peerIds_.Num());
-	std::copy(peerIds_.GetData(), peerIds_.GetData() + peerIds_.Num(), peerIds.begin());
+	gsstl::vector<int> peerIds(peerIds_.Num());
+	gsstl::copy(peerIds_.GetData(), peerIds_.GetData() + peerIds_.Num(), peerIds.begin());
 
 	if (!session || !IsReady)
 	{
@@ -79,19 +79,19 @@ void UGSRTSession::Send(int32 opCode, DeliveryIntent intent, UGSRTData* data, TA
 		return;
 	}
 
-	std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+	gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 	session->SendRTData(opCode, (GameSparks::RT::GameSparksRT::DeliveryIntent)intent, data->GetRTData(), peerIds);
 }
 
 
 TArray<int32> UGSRTSession::GetActivePeers()
 {
-	std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+	gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 	if (!session) return{};
 
 	TArray<int32> ret;
 	ret.SetNum(session->ActivePeers.size());
-	std::copy(session->ActivePeers.begin(), session->ActivePeers.end(), ret.GetData());
+	gsstl::copy(session->ActivePeers.begin(), session->ActivePeers.end(), ret.GetData());
 
 	return ret;
 }
@@ -99,7 +99,7 @@ TArray<int32> UGSRTSession::GetActivePeers()
 
 int32 UGSRTSession::GetPeerId()
 {
-	std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+	gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 	if (!session) return -1;
 	return session->PeerId.GetValueOrDefault(-1);
 }
@@ -135,7 +135,7 @@ void UGSRTSession::OnPacket(const GameSparks::RT::RTPacket& packet)
 
 void UGSRTSession::Tick(float DeltaTime)
 {
-	std::lock_guard<std::recursive_mutex> lock(sessionMutex);
+	gsstl::lock_guard<gsstl::recursive_mutex> lock(sessionMutex);
 	if (session && started)
 	{
 		session->Update();

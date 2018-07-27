@@ -1690,6 +1690,103 @@ namespace GameSparks
 
 			/*!
 			\ingroup Types
+			Location details.
+			This product includes GeoLite data created by MaxMind, available from <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
+			*/
+			class Location : public  GameSparks::Core::GSTypedResponse
+			{
+			public:
+				Location(const GameSparks::Core::GSData& data)
+					: GSTypedResponse(data)
+				{
+
+				}
+
+				Location(const Location& other)
+					: GSTypedResponse(other)
+				{
+				}
+
+			/// <summary>
+			/// The city
+			/// </summary>
+					// method type 4
+					Optional::t_StringOptional GetCity () const
+					{
+						return m_Response.GetString("city");
+					}
+			/// <summary>
+			/// The country
+			/// </summary>
+					// method type 4
+					Optional::t_StringOptional GetCountry () const
+					{
+						return m_Response.GetString("country");
+					}
+			/// <summary>
+			/// The latitude
+			/// </summary>
+					// method type 4
+					Optional::t_FloatOptional GetLatitide () const
+					{
+						return m_Response.GetFloat("latitide");
+					}
+			/// <summary>
+			/// The longditute
+			/// </summary>
+					// method type 4
+					Optional::t_FloatOptional GetLongditute () const
+					{
+						return m_Response.GetFloat("longditute");
+					}
+			};
+
+			/*!
+			\ingroup Types
+			A the details of a social connection
+			*/
+			class SocialStatus : public  GameSparks::Core::GSTypedResponse
+			{
+			public:
+				SocialStatus(const GameSparks::Core::GSData& data)
+					: GSTypedResponse(data)
+				{
+
+				}
+
+				SocialStatus(const SocialStatus& other)
+					: GSTypedResponse(other)
+				{
+				}
+
+			/// <summary>
+			/// When the token is still active.
+			/// </summary>
+					// method type 4
+					Optional::t_BoolOptional GetActive () const
+					{
+						return m_Response.GetBoolean("active");
+					}
+			/// <summary>
+			/// When the token expires (if available).
+			/// </summary>
+					// method type 4
+					GameSparks::Core::GSDateTime::t_Optional GetExpires () const
+					{
+						return m_Response.GetDate("expires");
+					}
+			/// <summary>
+			/// The identifier of the external platform.
+			/// </summary>
+					// method type 4
+					Optional::t_StringOptional GetSystemId () const
+					{
+						return m_Response.GetString("systemId");
+					}
+			};
+
+			/*!
+			\ingroup Types
 			Leaderboard entry data
 			As well as the parameters below there may be others depending on your game's configuration.
 			*/
@@ -1890,103 +1987,6 @@ namespace GameSparks
 							result.push_back(LeaderboardData(*it));
 						}
 						return result; 
-					}
-			};
-
-			/*!
-			\ingroup Types
-			Location details.
-			This product includes GeoLite data created by MaxMind, available from <a href="http://www.maxmind.com">http://www.maxmind.com</a>.
-			*/
-			class Location : public  GameSparks::Core::GSTypedResponse
-			{
-			public:
-				Location(const GameSparks::Core::GSData& data)
-					: GSTypedResponse(data)
-				{
-
-				}
-
-				Location(const Location& other)
-					: GSTypedResponse(other)
-				{
-				}
-
-			/// <summary>
-			/// The city
-			/// </summary>
-					// method type 4
-					Optional::t_StringOptional GetCity () const
-					{
-						return m_Response.GetString("city");
-					}
-			/// <summary>
-			/// The country
-			/// </summary>
-					// method type 4
-					Optional::t_StringOptional GetCountry () const
-					{
-						return m_Response.GetString("country");
-					}
-			/// <summary>
-			/// The latitude
-			/// </summary>
-					// method type 4
-					Optional::t_FloatOptional GetLatitide () const
-					{
-						return m_Response.GetFloat("latitide");
-					}
-			/// <summary>
-			/// The longditute
-			/// </summary>
-					// method type 4
-					Optional::t_FloatOptional GetLongditute () const
-					{
-						return m_Response.GetFloat("longditute");
-					}
-			};
-
-			/*!
-			\ingroup Types
-			A the details of a social connection
-			*/
-			class SocialStatus : public  GameSparks::Core::GSTypedResponse
-			{
-			public:
-				SocialStatus(const GameSparks::Core::GSData& data)
-					: GSTypedResponse(data)
-				{
-
-				}
-
-				SocialStatus(const SocialStatus& other)
-					: GSTypedResponse(other)
-				{
-				}
-
-			/// <summary>
-			/// When the token is still active.
-			/// </summary>
-					// method type 4
-					Optional::t_BoolOptional GetActive () const
-					{
-						return m_Response.GetBoolean("active");
-					}
-			/// <summary>
-			/// When the token expires (if available).
-			/// </summary>
-					// method type 4
-					GameSparks::Core::GSDateTime::t_Optional GetExpires () const
-					{
-						return m_Response.GetDate("expires");
-					}
-			/// <summary>
-			/// The identifier of the external platform.
-			/// </summary>
-					// method type 4
-					Optional::t_StringOptional GetSystemId () const
-					{
-						return m_Response.GetString("systemId");
 					}
 			};
 		}

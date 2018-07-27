@@ -12,7 +12,7 @@ namespace GameSparks { namespace RT {
 		public:
 			System::Bytes payload;
 
-			CustomRequest(int opCode, GameSparksRT::DeliveryIntent intent, const System::ArraySegment<System::Byte>& payload, const RTData& data,  std::vector<int> targetPlayers);
+			CustomRequest(int opCode, GameSparksRT::DeliveryIntent intent, const System::ArraySegment<System::Byte>& payload, const RTData& data, gsstl::vector<int> targetPlayers);
 
 			virtual System::Failable<void> Serialize(System::IO::Stream &stream) const override;
 		private:

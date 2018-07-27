@@ -42,7 +42,7 @@ namespace GameSparks { namespace RT {
 			/// <summary>
 			/// The list of peers who are currently connected.
 			/// </summary>
-			std::vector<int> ActivePeers;
+			gsstl::vector<int> ActivePeers;
 
 			/// <summary>
 			/// The connection state of the session.
@@ -57,7 +57,7 @@ namespace GameSparks { namespace RT {
 			/// <param name="payload">Th byte arry to send</param>
 			/// <param name="targetPlayers">The list of players to send to (empty to send to all)</param>
 			virtual int SendData(int opCode, GameSparksRT::DeliveryIntent intent, const System::Bytes &payload,
-								 const RTData &data, const std::vector<int> &targetPlayers) = 0;
+								 const RTData &data, const gsstl::vector<int> &targetPlayers) = 0;
 
 			/// <summary>
 			/// Sends a strucured message to other players
@@ -67,7 +67,7 @@ namespace GameSparks { namespace RT {
 			/// <param name="data">The RTData object to send</param>
 			/// <param name="targetPlayers">The list of players to send to (empty to send to all)</param>
 			virtual int SendRTData(int opCode, GameSparksRT::DeliveryIntent deliveryIntent, const RTData &data,
-								   const std::vector<int> &targetPlayer) =0;
+								   const gsstl::vector<int> &targetPlayer) =0;
 
 			/// <summary>
 			/// Sends a byte[] to other players
@@ -78,7 +78,7 @@ namespace GameSparks { namespace RT {
 			/// <param name="targetPlayers">The list of players to send to (empty to send to all)</param>
 			virtual int SendBytes(int opCode, GameSparksRT::DeliveryIntent deliveryIntent,
 								  const System::ArraySegment<System::Byte> &payload,
-								  const std::vector<int> &targetPlayer) =0;
+								  const gsstl::vector<int> &targetPlayer) =0;
 
 			/// <summary>
 			/// Sends both RTData and bytes to other players
@@ -89,7 +89,7 @@ namespace GameSparks { namespace RT {
 			/// <param name="targetPlayers">The list of players to send to (empty to send to all)</param>
 			virtual int SendRTDataAndBytes(int opCode, GameSparksRT::DeliveryIntent intent,
 										   const System::ArraySegment<System::Byte> &payload, const RTData &data,
-										   const std::vector<int> &targetPlayer) =0;
+										   const gsstl::vector<int> &targetPlayer) =0;
 
 			/// <summary>
 			/// This method should be called as frequently as possible by the thread you want

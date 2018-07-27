@@ -2,7 +2,7 @@
 #define _GAMESPARKSRT_PROTOCOLPARSER_HPP_
 
 #include <algorithm>
-#include <string>
+//#include <string>
 #include <vector>
 
 #include "../../System/IO/Stream.hpp"
@@ -31,7 +31,7 @@ namespace GameSparks { namespace RT { namespace Proto {
 			Key(unsigned int field, Wire wireType)
 			:Field(field), WireType(wireType) { }
 
-			std::string ToString() const
+			gsstl::string ToString() const
 			{
 				return "[Key: " + System::String::ToString(Field) + ", " + System::String::ToString(int(WireType)) + "]";
 			}
@@ -49,7 +49,7 @@ namespace GameSparks { namespace RT { namespace Proto {
 			:Key(key)
 			,Value(value) { }
 
-			std::string ToString() const
+			gsstl::string ToString() const
 			{
 				return "[KeyValue: " + System::String::ToString(Key.Field) + ", " + System::String::ToString(int(Key.WireType)) + ", " + System::String::ToString(Value.size()) + " bytes]";
 			}
@@ -64,7 +64,7 @@ namespace GameSparks { namespace RT { namespace Proto {
         typedef unsigned char byte;
         typedef unsigned int uint;
         //typedef uint64_t uint64_t;
-        typedef std::string string;
+        typedef gsstl::string string;
         typedef System::Bytes bytes;
 
         static System::Failable<Key> ReadKey(byte firstByte, System::IO::Stream& stream)
@@ -107,7 +107,7 @@ namespace GameSparks { namespace RT { namespace Proto {
 			}
 		}
 
-        static System::Failable<string> ReadString(System::IO::Stream& stream)
+        static System::Failable<gsstl::string> ReadString(System::IO::Stream& stream)
         {
 			//VarInt length
             GS_ASSIGN_OR_THROW(length, ReadUInt32(stream));
@@ -119,14 +119,14 @@ namespace GameSparks { namespace RT { namespace Proto {
 			uint read = 0;
 
 			while (read < length) {
-				GS_ASSIGN_OR_THROW(r, stream.Read(buffer, 0, std::min<int>(length - read, int(buffer.size()))));
+				GS_ASSIGN_OR_THROW(r, stream.Read(buffer, 0, gsstl::min<int>(length - read, int(buffer.size()))));
                 if (r == 0)
 					return ::GameSparks::RT::Proto::ProtocolBufferException("Expected " + System::String::ToString(length - read) + " got " + System::String::ToString(read));
 				GS_CALL_OR_THROW(ms.Write (buffer, 0, r));
 				read += r;
 			}
 
-			string ret = System::Text::Encoding::UTF8::GetString(ms.GetBuffer(), 0, (int)ms.Position());
+			gsstl::string ret = System::Text::Encoding::UTF8::GetString(ms.GetBuffer(), 0, (int)ms.Position());
 
 			//PooledObjects.ByteBufferPool.Push (buffer);
 			//PooledObjects.MemoryStreamPool.Push (ms);

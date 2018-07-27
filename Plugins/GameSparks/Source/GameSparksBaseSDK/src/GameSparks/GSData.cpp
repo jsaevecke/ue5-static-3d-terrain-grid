@@ -265,7 +265,7 @@ gsstl::string GSData::GetJSON() const
 {
 	char* asText = cJSON_Print(m_Data);
 	gsstl::string result(asText);
-	cJSON_free(asText);
+	free(asText);
 	return result;
 }
 

@@ -1,6 +1,6 @@
 // Copyright 2015 GameSparks Ltd 2015, Inc. All Rights Reserved.
 #include <GameSparks/GSUtil.h>
-
+#include <GameSparks/gsstl.h>
 #include <mbedtls/sha256.h>
 
 using namespace GameSparks::Util;
@@ -128,10 +128,11 @@ gsstl::string GameSparks::Util::base64_decode(gsstl::string const& encoded_strin
 static gsstl::string sha256(const gsstl::string& in)
 {
 	unsigned char output[32];
+    
 	mbedtls_sha256((const unsigned char*)&in[0], in.size(), output, 0);
-
-	gsstl::string ret(32, 0x00);
-	std::copy(output, output+32, ret.begin());
+    
+    gsstl::string ret((const char *)output, 32);
+    
 	return ret;
 }
 
@@ -141,10 +142,10 @@ static gsstl::string str_xor(const gsstl::string& a, const gsstl::string& b)
 {
 	assert(a.size() == b.size());
 	gsstl::string ret(a.size(), 0x00);
-
+    
 	for(size_t i=0; i!=a.size(); ++i)
 	{
-		ret[i] = a[i] ^ b[i];
+        ret[i] = a[i] ^ b[i];
 	}
 	return ret;
 }
@@ -165,10 +166,10 @@ static gsstl::string hmac_sha256(gsstl::string key, const gsstl::string& message
 		// keys shorter than blocksize are zero-padded
 		key = key + gsstl::string(blocksize - key.size(), 0x00);
 	}
-
+    
 	gsstl::string o_key_pad(blocksize, 0x5c);
 	o_key_pad = str_xor(o_key_pad, key);
-
+    
 	gsstl::string i_key_pad(blocksize, 0x36);
 	i_key_pad = str_xor(i_key_pad, key);
 
@@ -179,6 +180,7 @@ gsstl::string GameSparks::Util::getHMAC(gsstl::string nonce, gsstl::string appSe
 {
 	gsstl::string tmp = hmac_sha256(appSecret, nonce);
 	gsstl::string str = base64_encode((const unsigned char*)tmp.data(), (unsigned int)tmp.size());
+    
 	return str;
 }
 
@@ -186,4 +188,3 @@ bool GameSparks::Util::shouldConnect()
 {
 	return true;
 }
-

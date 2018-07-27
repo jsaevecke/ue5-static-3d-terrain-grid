@@ -11,7 +11,7 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 
 System::Failable<LoginResult*> LoginResult::Deserialize(System::IO::Stream& stream)
 {
-    std::unique_ptr<LoginResult> instance(new LoginResult());
+    gsstl::unique_ptr<LoginResult> instance(new LoginResult());
 	for (;;)
     {
         GS_ASSIGN_OR_THROW(keyByte, stream.ReadByte());

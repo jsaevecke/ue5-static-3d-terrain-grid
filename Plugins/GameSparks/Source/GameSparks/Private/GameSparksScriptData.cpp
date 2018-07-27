@@ -33,7 +33,7 @@ FString UGameSparksScriptData::GetString(const FString& name) const
 {
     if(m_Data.GetString(TCHAR_TO_UTF8(*name)).HasValue())
     {
-        std::string str = m_Data.GetString(TCHAR_TO_UTF8(*name)).GetValue();
+        gsstl::string str = m_Data.GetString(TCHAR_TO_UTF8(*name)).GetValue();
         return FString(UTF8_TO_TCHAR(str.c_str()));
     }
     {

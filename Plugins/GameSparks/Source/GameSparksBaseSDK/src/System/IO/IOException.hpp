@@ -7,7 +7,7 @@ namespace System { namespace IO {
 
 	class IOException : public SystemException
 	{
-		public: IOException(const std::string what) : SystemException(what, "System.IO.IOException") {}
+		public: IOException(const gsstl::string what) : SystemException(what, "System.IO.IOException") {}
 	};
 
 }} /* namespace System.IO */

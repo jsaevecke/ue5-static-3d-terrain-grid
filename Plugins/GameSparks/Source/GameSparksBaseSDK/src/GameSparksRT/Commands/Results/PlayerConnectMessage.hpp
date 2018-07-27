@@ -13,7 +13,7 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 	{
 		public:
 			int PeerId = -1;
-			std::vector<int> ActivePeers;
+			gsstl::vector<int> ActivePeers;
 
 			static System::Failable<PlayerConnectMessage*> Deserialize(System::IO::Stream& stream);
 			virtual void Execute() override;

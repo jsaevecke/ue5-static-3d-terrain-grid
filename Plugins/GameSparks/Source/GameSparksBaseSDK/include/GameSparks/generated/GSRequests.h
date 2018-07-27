@@ -4863,64 +4863,6 @@ namespace GameSparks
 			};
 			
 			/*!
-			\ingroup Store
-			Consumes a consumable item from Xbox Live
-			*/
-			class XboxOneBuyGoodsRequest : public GameSparks::Core::GSTypedRequest < XboxOneBuyGoodsRequest, GameSparks::Api::Responses::BuyVirtualGoodResponse >
-			{
-			public:
-				XboxOneBuyGoodsRequest(Core::GS& gsInstance)
-					: GSTypedRequest(gsInstance, ".XboxOneBuyGoodsRequest")
-				{
-
-				}
-			
-
-
-			/// <summary>
-			/// The ISO 4217 currency code representing the real-world currency used for this transaction.
-			/// </summary>
-			XboxOneBuyGoodsRequest& SetCurrencyCode( const gsstl::string& currencyCode )
-			{
-				m_Request.AddString("currencyCode", currencyCode);
-				return *this;
-			}
-			/// <summary>
-			/// The ID of the inventory item to consume. This should match the Xbox One product code on the virtual good.
-			/// </summary>
-			XboxOneBuyGoodsRequest& SetItemId( const gsstl::string& itemId )
-			{
-				m_Request.AddString("itemId", itemId);
-				return *this;
-			}
-			/// <summary>
-			/// The quantity of the inventory item to consume.
-			/// </summary>
-			XboxOneBuyGoodsRequest& SetItemsConsumed( int itemsConsumed )
-			{
-				m_Request.AddNumber("itemsConsumed", itemsConsumed);
-				return *this;
-			}
-			/// <summary>
-			/// The price of this purchase
-			/// </summary>
-			XboxOneBuyGoodsRequest& SetSubUnitPrice( double subUnitPrice )
-			{
-				m_Request.AddNumber("subUnitPrice", subUnitPrice);
-				return *this;
-			}
-			/// <summary>
-			/// If set to true, the transactionId from this receipt will not be globally valdidated, this will mean replays between players are possible.
-			/// It will only validate the transactionId has not been used by this player before.
-			/// </summary>
-			XboxOneBuyGoodsRequest& SetUniqueTransactionByPlayer( bool uniqueTransactionByPlayer )
-			{
-				m_Request.AddBoolean("uniqueTransactionByPlayer", uniqueTransactionByPlayer);
-				return *this;
-			}
-			};
-			
-			/*!
 			\ingroup Authentication
 			Allows an Xbox One XSTS token to be used as an authentication mechanism.
 			Once authenticated the platform can determine the current players details from Xbox Live and store them within GameSparks.

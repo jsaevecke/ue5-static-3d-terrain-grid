@@ -1,9 +1,9 @@
 #ifndef _SYSTEM_STRING_HPP_INCLUDED_
 #define _SYSTEM_STRING_HPP_INCLUDED_
 
-#include <string>
-#include <sstream>
-#include <iomanip>
+//#include <string>
+//#include <sstream>
+//#include <iomanip>
 
 namespace System {
 
@@ -12,10 +12,10 @@ namespace System {
 		public:
 
 		template <typename T>
-		static std::string ToString(const T& o)
+		static gsstl::string ToString(const T& o)
         {
-            std::stringstream stream;
-            stream << std::boolalpha;
+            gsstl::stringstream stream;
+            stream << gsstl::boolalpha;
             stream << o;
             return stream.str();
         }

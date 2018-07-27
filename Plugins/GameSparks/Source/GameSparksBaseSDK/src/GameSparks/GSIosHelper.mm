@@ -4,8 +4,8 @@
 #include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/utsname.h>
-#include <iostream>
-#include <thread>
+//#include <iostream>
+//#include <thread>
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
@@ -54,7 +54,7 @@
 
     namespace
     {
-        static std::string getDisplayResolution()
+        static gsstl::string getDisplayResolution()
         {
             @autoreleasepool
             {
@@ -75,8 +75,9 @@
             ret["model"]        = systemInfo.machine;
             
             ret["cpu.vendor"]   = "ARM";
-            ret["cpu.cores"]    = std::to_string( std::thread::hardware_concurrency() );
-            ret["memory"]       = std::to_string([NSProcessInfo processInfo].physicalMemory / 1024 / 1024) + " MB";
+            //TODO
+            /*ret["cpu.cores"]    = gsstl::to_string(gsstl::thread::hardware_concurrency() );
+            ret["memory"]       = gsstl::to_string([NSProcessInfo processInfo].physicalMemory / 1024 / 1024) + " MB";*/
             ret["os.name"]      = [[[UIDevice currentDevice] systemName] UTF8String];
             ret["os.version"]   = [[[UIDevice currentDevice] systemVersion] UTF8String];
             ret["resolution"]   = getDisplayResolution();
@@ -127,22 +128,22 @@
 
 namespace
 {
-    static std::string sysctlbyname_string(const std::string name)
+    static gsstl::string sysctlbyname_string(const gsstl::string name)
     {
         size_t length;
-        std::string hw_model;
+        gsstl::string hw_model;
         ::sysctlbyname(name.c_str(), NULL, &length, NULL, 0);
         if (length)
         {
-            std::vector<char> hw_string_(length, 0);
+            gsstl::vector<char> hw_string_(length, 0);
             ::sysctlbyname(name.c_str(), hw_string_.data(), &length, NULL, 0);
-            std::copy(hw_string_.begin(), hw_string_.end() - 1, std::back_inserter(hw_model));
+            gsstl::copy(hw_string_.begin(), hw_string_.end() - 1, gsstl::back_inserter(hw_model));
         }
         return hw_model;
     }
     
     template <typename T>
-    static T sysctlbyname_generic(const std::string name)
+    static T sysctlbyname_generic(const gsstl::string name)
     {
         T ret=0;
         size_t length = sizeof(T);
@@ -153,7 +154,7 @@ namespace
         return ret;
     }
     
-    static std::string getMacOSName()
+    static gsstl::string getMacOSName()
     {
         @autoreleasepool
         {
@@ -162,7 +163,7 @@ namespace
         }
     }
     
-    static std::string getMacOSVersion()
+    static gsstl::string getMacOSVersion()
     {
         @autoreleasepool
         {
@@ -171,7 +172,7 @@ namespace
         }
     }
     
-    static std::string getDisplayResolution()
+    static gsstl::string getDisplayResolution()
     {
         @autoreleasepool
         {
@@ -189,8 +190,8 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
     
     ret["cpu.vendor"]   = sysctlbyname_string("machdep.cpu.brand_string");
     //ret["cpu.cores"]    = std::to_string(sysctlbyname_generic<uint32_t>("hw.logicalcpu"));
-    ret["cpu.cores"]    = std::to_string( std::thread::hardware_concurrency() );
-    ret["memory"]       = std::to_string(sysctlbyname_generic<uint64_t>("hw.memsize") / 1024 / 1024) + " MB";
+    ret["cpu.cores"]    = gsstl::to_string(gsstl::thread::hardware_concurrency() );
+    ret["memory"]       = gsstl::to_string(sysctlbyname_generic<uint64_t>("hw.memsize") / 1024 / 1024) + " MB";
     ret["model"]        = sysctlbyname_string("hw.model");
     ret["os.name"]      = getMacOSName();
     ret["os.version"]   = getMacOSVersion();

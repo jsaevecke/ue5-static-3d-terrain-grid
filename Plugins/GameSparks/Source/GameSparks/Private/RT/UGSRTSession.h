@@ -147,6 +147,6 @@ class UGSRTSession : public UObject, public FTickableGameObject//, public GameSp
 		};
 		TUniquePtr<RTSessionListenerProxy> sessionListener;
         TUniquePtr<GameSparks::RT::IRTSession> session;
-		std::recursive_mutex sessionMutex;
+		gsstl::recursive_mutex sessionMutex;
 		bool started = false;
 };

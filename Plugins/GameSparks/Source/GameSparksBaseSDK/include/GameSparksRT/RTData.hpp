@@ -9,10 +9,11 @@
 #include "System/Bytes.hpp"
 #include "System/FailableForward.hpp"
 //#include "../../src/System/Failable.hpp"
+#include "../GameSparks/gsstl.h"
 
-#include <string>
-#include <ostream>
-#include <array>
+//#include <string>
+//#include <ostream>
+//#include <array>
 
 namespace System{
 	namespace IO
@@ -40,7 +41,7 @@ namespace GameSparks { namespace RT {
             RTVector(float x_, float y_) : x(x_), y(y_) {}
             RTVector(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {}
             RTVector(float x_, float y_, float z_, float w_) : x(x_), y(y_), z(z_), w(w_) {}
-			friend std::ostream& operator << (std::ostream& os, const RTVector& p);
+			friend gsstl::ostream& operator << (gsstl::ostream& os, const RTVector& p);
 
 			bool operator == (const RTVector& o) const
 			{
@@ -67,7 +68,7 @@ namespace GameSparks { namespace RT {
             System::Nullable<int64_t> GetLong(uint index) const;
             System::Nullable<float> GetFloat(uint index) const;
             System::Nullable<double> GetDouble(uint index) const;
-            System::Nullable<std::string> GetString(uint index) const;
+            System::Nullable<gsstl::string> GetString(uint index) const;
             System::Nullable<RTData> GetData(uint index) const;
 
             RTData& SetInt(uint index, int value);
@@ -75,15 +76,15 @@ namespace GameSparks { namespace RT {
             RTData& SetRTVector(uint index, RTVector value);
             RTData& SetFloat(uint index, float value);
             RTData& SetDouble(uint index, double value);
-            RTData& SetString(uint index, const std::string& value);
+            RTData& SetString(uint index, const gsstl::string& value);
             RTData& SetData(uint index, const RTData& value);
-            friend GS_API std::ostream& operator << (std::ostream& os, const RTData& p);
+            friend GS_API gsstl::ostream& operator << (gsstl::ostream& os, const RTData& p);
         private:
             friend Proto::RTValSerializer;
             friend Proto::RTDataSerializer;
 
             // maybe we want to store that sparse (std::map) ?
-            std::array<Proto::RTVal, GameSparksRT::MAX_RTDATA_SLOTS> data;
+            gsstl::array<Proto::RTVal, GameSparksRT::MAX_RTDATA_SLOTS> data;
 
             friend Proto::Packet;
             static System::Failable<void> WriteRTData (System::IO::Stream& stream, const RTData& instance);
@@ -109,7 +110,7 @@ namespace GameSparks { namespace RT {
 			const System::Bytes& Payload; ///< Use this if you want to use your own data-serialization format.
 
             /// ostream operator for debug output.
-			friend std::ostream& operator << (std::ostream& os, const RTPacket& p)
+			friend gsstl::ostream& operator << (gsstl::ostream& os, const RTPacket& p)
 			{
 				os << "OpCode=" << p.OpCode << ",Sender=" << p.Sender << ",StreamLength=" << p.StreamLength << ",Data=" << p.Data;// << (Data != nullptr ? Data.ToString() : "");
 				return os;

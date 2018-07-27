@@ -5,8 +5,9 @@
 #endif
 
 #include <GameSparks/IGSPlatform.h>
+#include <GameSparks/gsstl.h>
 
-#include <fstream>
+//#include <fstream>
 
 #if GS_TARGET_PLATFORM == GS_PLATFORM_ANDROID
 #	include <sys/types.h>
@@ -86,24 +87,6 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats();
 
 namespace GameSparks { namespace Core {
 
-
-// trim from start
-static inline gsstl::string &ltrim(gsstl::string &s) {
-        s.erase(s.begin(), gsstl::find_if(s.begin(), s.end(), gsstl::not1(gsstl::ptr_fun<int, int>(isspace))));
-        return s;
-}
-
-// trim from end
-static inline gsstl::string &rtrim(gsstl::string &s) {
-        s.erase(gsstl::find_if(s.rbegin(), s.rend(), gsstl::not1(gsstl::ptr_fun<int, int>(isspace))).base(), s.end());
-        return s;
-}
-
-// trim from both ends
-static inline gsstl::string &trim(gsstl::string &s) {
-        return ltrim(rtrim(s));
-}
-
 #if GS_TARGET_PLATFORM != GS_PLATFORM_MAC && GS_TARGET_PLATFORM != GS_PLATFORM_IOS && !(defined(NN_NINTENDO_SDK) && !defined(_WIN32))
 static gsstl::string generate_guid()
 {
@@ -128,8 +111,8 @@ static gsstl::string generate_guid()
 			OLECHAR* bstrGuid;
 			StringFromCLSID(guid, &bstrGuid);
 
-			typedef std::codecvt_utf8<wchar_t> convert_type;
-			std::wstring_convert<convert_type, wchar_t> converter;
+			typedef gsstl::codecvt_utf8<wchar_t> convert_type;
+			gsstl::wstring_convert<convert_type, wchar_t> converter;
 
 			ret = converter.to_bytes(bstrGuid);
 
@@ -172,7 +155,7 @@ static gsstl::string generate_guid()
 		return ret;
 	*/
 	//assert(false);
-	return trim(ret);
+	return gsstl::trim(ret);
 }
 #endif
 
@@ -198,7 +181,7 @@ gsstl::string IGSPlatform::GetDeviceId() const
 			}
 		#endif
 
-		device_id = trim(device_id);
+		device_id = gsstl::trim(device_id);
 	}
 
 	return device_id;
@@ -256,7 +239,7 @@ gsstl::string IGSPlatform::GetPlatform() const
 
 #if defined(WIN32)
 // convert UTF-8 string to wstring
-static std::wstring utf8_to_wstring(const std::string& str)
+static gsstl::wstring utf8_to_wstring(const gsstl::string& str)
 {
 	int output_size = MultiByteToWideChar(CP_UTF8, NULL, str.c_str(), static_cast<int>(str.size()), NULL, 0);
 	assert(output_size > 0);
@@ -264,14 +247,14 @@ static std::wstring utf8_to_wstring(const std::string& str)
 	int result = MultiByteToWideChar(CP_UTF8, NULL, str.c_str(), static_cast<int>(str.size()), buffer.data(), static_cast<int>(buffer.size()));
 	(void)result; // unused in release builds
 	assert( result == output_size );
-	std::wstring ret(buffer.begin(), buffer.end());
+	gsstl::wstring ret(buffer.begin(), buffer.end());
 	return ret;
 	//std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
 	//return myconv.from_bytes(str);
 }
 
 // convert wstring to UTF-8 string
-static std::string wstring_to_utf8(const std::wstring& str)
+static gsstl::string wstring_to_utf8(const gsstl::wstring& str)
 {
 	int output_size = WideCharToMultiByte(CP_UTF8, NULL, str.c_str(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
 	assert(output_size > 0);
@@ -279,7 +262,7 @@ static std::string wstring_to_utf8(const std::wstring& str)
 	int result = WideCharToMultiByte(CP_UTF8, NULL, str.c_str(), static_cast<int>(str.size()), buffer.data(), static_cast<int>(buffer.size()), NULL, NULL);
 	(void)result; // unused in release builds
 	assert(result == output_size);
-	std::string ret(buffer.begin(), buffer.end());
+	gsstl::string ret(buffer.begin(), buffer.end());
 	return ret;
 
 	//std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
@@ -395,7 +378,7 @@ gsstl::string IGSPlatform::ToWritableLocation(gsstl::string desired_name) const
 
 				base_path = base_path + "\\GameSparks\\" + m_apiKey + "\\";
 
-				std::replace(base_path.begin(), base_path.end(), '/', '\\');
+				gsstl::replace(base_path.begin(), base_path.end(), '/', '\\');
 
 				int result = SHCreateDirectoryExW(NULL, utf8_to_wstring(base_path).c_str(), NULL);
 
@@ -417,7 +400,7 @@ gsstl::string IGSPlatform::ToWritableLocation(gsstl::string desired_name) const
 			return base_path + desired_name;
 		#else
 			// you might need to ensure, that you allocated storage via your manifest
-			static std::wstring wbase_path = Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data();
+			static gsstl::wstring wbase_path = Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data();
 			static auto base_path = wstring_to_utf8(wbase_path);
 			return base_path + "\\" + desired_name;
 		#endif /* defined(GS_WINDOWS_DESKTOP) */
@@ -513,9 +496,9 @@ gsstl::string IGSPlatform::ToWritableLocation(gsstl::string desired_name) const
 	#endif
 }
 
-static bool gs_is_digits(const std::string &str)
+static bool gs_is_digits(const gsstl::string &str)
 {
-    return str.find_first_not_of("0123456789") == std::string::npos;
+    return str.find_first_not_of("0123456789") == gsstl::string::npos;
 }
 
 // split s by '.' and return at most the first two parts. if non digits are found in the first two places, an empty vector is returned.
@@ -526,7 +509,7 @@ static gsstl::vector<gsstl::string> gs_major_minor_version_split(const gsstl::st
     gsstl::vector<gsstl::string> tokens;
     size_t start = 0U;
     size_t end = s.find(delim);
-    for (;end != std::string::npos;start = end + 1, end = s.find(delim, start))
+    for (;end != gsstl::string::npos;start = end + 1, end = s.find(delim, start))
     {
         gsstl::string part = s.substr(start, end - start);
         if (!gs_is_digits(part))
@@ -583,15 +566,15 @@ gsstl::map<gsstl::string, gsstl::string> IGSPlatform::GetDeviceStats() const
 	}} // namespace GameSparks { namespace Core {
 
 
-#include <sstream>
+//#include <sstream>
 
 namespace
 {
 	template <typename T>
 	static gsstl::string to_string(const T& o)
 	{
-		std::stringstream ss;
-		ss << std::boolalpha << o;
+		gsstl::stringstream ss;
+		ss << gsstl::boolalpha << o;
 		return ss.str();
 	}
 }
@@ -606,7 +589,7 @@ namespace
 
 namespace
 {
-	std::string get_mem_info()
+	gsstl::string get_mem_info()
 	{
 		#if (defined(__ANDROID_API__) && (__ANDROID_API__ >= 9)) || defined(__linux__)
 		struct sysinfo sysi;
@@ -617,10 +600,10 @@ namespace
 		}
 		#endif
 
-		std::ifstream ifs("/proc/meminfo");
+		gsstl::ifstream ifs("/proc/meminfo");
 		if(ifs.good())
 		{
-			std::string key, value, unit;
+			gsstl::string key, value, unit;
 			ifs >> key;
 			ifs >> value;
 			ifs >> unit;
@@ -634,27 +617,7 @@ namespace
 		return "";
 	}
 
-
-	// trim from start
-	static inline std::string &ltrim(std::string &s) {
-		s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-										std::not1(std::ptr_fun<int, int>(std::isspace))));
-		return s;
-	}
-
-	// trim from end
-	static inline std::string &rtrim(std::string &s) {
-		s.erase(std::find_if(s.rbegin(), s.rend(),
-							 std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-		return s;
-	}
-
-	// trim from both ends
-	static inline std::string &trim(std::string &s) {
-		return ltrim(rtrim(s));
-	}
-
-	static std::string get_cpu_model()
+	static gsstl::string get_cpu_model()
 	{
 		/*
          * Format:
@@ -663,19 +626,19 @@ namespace
          * lax parser, fault tolerant
          * */
 
-		std::ifstream ifs("/proc/cpuinfo");
+		gsstl::ifstream ifs("/proc/cpuinfo");
 
-		std::string line;
-		while(std::getline(ifs, line))
+		gsstl::string line;
+		while(gsstl::getline(ifs, line))
 		{
-			std::istringstream iss(line);
+			gsstl::istringstream iss(line);
 
-			std::string key, value;
+			gsstl::string key, value;
 
-			if(std::getline(iss, key, ':') && std::getline(iss, value, '\0'))
+			if(gsstl::getline(iss, key, ':') && gsstl::getline(iss, value, '\0'))
 			{
-				trim(key);
-				trim(value);
+				gsstl::trim(key);
+				gsstl::trim(value);
 				if(key == "Hardware" || key == "model name")
 					return value;
 			}
@@ -696,9 +659,9 @@ namespace
 namespace {
 
     // __system_property_get is a private API and was removed from the arm64 libc.a - so we parse it our selves
-    static std::string get_system_property(const std::string& name)
+    static gsstl::string get_system_property(const gsstl::string& name)
     {
-        static std::map<std::string, std::string> system_properties;
+        static gsstl::map<gsstl::string, gsstl::string> system_properties;
         if(system_properties.empty())
         {
             /*
@@ -709,18 +672,18 @@ namespace {
              *   lax parser, fault tolerant
              * */
 
-            std::ifstream ifs("/system/build.prop");
+            gsstl::ifstream ifs("/system/build.prop");
             //std::istringstream ifs(prop_test_string);
 
-            std::string line;
-            while(std::getline(ifs, line))
+            gsstl::string line;
+            while(gsstl::getline(ifs, line))
             {
                 if( line.size() == 0 || line[0] == '#' )
                     continue;
 
-                std::istringstream iss(line);
-                std::string key, value;
-                if(std::getline(iss, key, '=') && std::getline(iss, value, '\0'))
+                gsstl::istringstream iss(line);
+                gsstl::string key, value;
+                if(gsstl::getline(iss, key, '=') && gsstl::getline(iss, value, '\0'))
                 {
                     system_properties[key] = value;
                 }
@@ -731,10 +694,10 @@ namespace {
 
 
 	// this will most likely fail
-	static std::string get_display_resolution()
+	static gsstl::string get_display_resolution()
 	{
 		// http://stackoverflow.com/questions/14377407/android-how-to-get-display-resolution-in-native-code
-		std::string res_string = "";
+		gsstl::string res_string = "";
 
 		struct fb_var_screeninfo fb_var;
 		int fd = open("/dev/graphics/fb0", O_RDONLY);
@@ -766,7 +729,7 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
     }
 	ret["model"]        = get_system_property("ro.product.model");
 	ret["cpu.vendor"]   = get_cpu_model();
-	ret["cpu.cores"]    = to_string(std::thread::hardware_concurrency());
+	ret["cpu.cores"]    = to_string(gsstl::thread::hardware_concurrency());
 	ret["os.version"]   = get_system_property("ro.build.version.sdk");
 	ret["manufacturer"] = get_system_property("ro.product.manufacturer");
 
@@ -795,7 +758,7 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 
     ret["memory"]       = get_mem_info();
 	ret["cpu.vendor"]   = get_cpu_model();
-	ret["cpu.cores"]    = to_string(std::thread::hardware_concurrency());
+	ret["cpu.cores"]    = to_string(gsstl::thread::hardware_concurrency());
 
     //ret["manufacturer"] = "Linux";
 	//ret["model"]        = "Linux";
@@ -824,8 +787,8 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 #    if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
 #        include <shlwapi.h>
 #        include <shlobj.h>
-#        include <cassert>
-#        include <iostream>
+//#        include <cassert>
+//#        include <iostream>
 #        pragma comment(lib, "shlwapi.lib")
 #        pragma comment(lib, "Rpcrt4.lib")
 #        pragma comment(lib, "Version.lib")
@@ -842,22 +805,22 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 
 namespace
 {
-	static std::string get_pe_version(const std::wstring& executable)
+	static gsstl::string get_pe_version(const gsstl::wstring& executable)
 	{
 		DWORD version_buf_len, handle;
 		if ((version_buf_len = GetFileVersionInfoSizeW(executable.c_str(), &handle)) == 0)
 		{
 			auto eid = GetLastError();
-			std::cerr << "GetFileVersionInfoSize failed: " << eid << '\n';
+			gsstl::cerr << "GetFileVersionInfoSize failed: " << eid << '\n';
 			return{};
 		}
 
 		// pre-allocated buffer for version information to be stored
-		std::vector<BYTE> version_buf(version_buf_len);
+		gsstl::vector<BYTE> version_buf(version_buf_len);
 		if (!GetFileVersionInfoW(executable.c_str(), 0, version_buf_len, version_buf.data()))
 		{
 			auto eid = GetLastError();
-			std::cerr << "GetFileVersionInfo failed: " << eid << '\n';
+			gsstl::cerr << "GetFileVersionInfo failed: " << eid << '\n';
 			return {};
 		}
 
@@ -868,11 +831,11 @@ namespace
 		if (!VerQueryValueA(version_buf.data(), "\\", reinterpret_cast<LPVOID *>(&p_verinfo), &len))
 		{
 			auto eid = GetLastError();
-			std::cerr << "VerQueryValue failed: " << eid << '\n';
+			gsstl::cerr << "VerQueryValue failed: " << eid << '\n';
 			return{};
 		}
 
-		std::stringstream s;
+		gsstl::stringstream s;
 		if (p_verinfo->dwSignature == 0XFEEF04BD)
 		{
 			s << HIWORD(p_verinfo->dwProductVersionMS) << "."
@@ -883,7 +846,7 @@ namespace
 		return s.str();
 	}
 
-	static std::string get_mem_info()
+	static gsstl::string get_mem_info()
 	{
 		MEMORYSTATUSEX memoryStatus;
 		memoryStatus.dwLength = sizeof(memoryStatus);
@@ -897,7 +860,7 @@ namespace
 		}
 	}
 
-	static std::string get_cpu_model()
+	static gsstl::string get_cpu_model()
 	{
 		int cpuInfo[4] = { -1 };
 		char CPUBrandString[0x40];
@@ -916,7 +879,7 @@ namespace
 		return CPUBrandString;
 	}
 
-	static std::string get_display_resolution()
+	static gsstl::string get_display_resolution()
 	{
 		RECT desktop;
 		const HWND hDesktop = GetDesktopWindow();
@@ -939,7 +902,7 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 
 	ret["memory"] = get_mem_info();
 	ret["cpu.vendor"] = get_cpu_model();
-	ret["cpu.cores"] = to_string(std::thread::hardware_concurrency());
+	ret["cpu.cores"] = to_string(gsstl::thread::hardware_concurrency());
 
 	ret["resolution"]   = get_display_resolution();
 
@@ -950,7 +913,7 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 
 namespace
 {
-	static std::string get_cpu_model()
+	static gsstl::string get_cpu_model()
 	{
 		SYSTEM_INFO systemInfo;
 		GetNativeSystemInfo(&systemInfo);
@@ -977,7 +940,7 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 	auto deviceInfo = ref new Windows::Security::ExchangeActiveSyncProvisioning::EasClientDeviceInformation();
 
 	ret["cpu.vendor"] = get_cpu_model();
-	ret["cpu.cores"] = to_string(std::thread::hardware_concurrency());
+	ret["cpu.cores"] = to_string(gsstl::thread::hardware_concurrency());
 	ret["manufacturer"] = GameSparks::Core::wstring_to_utf8(deviceInfo->SystemManufacturer->Data());
 	ret["os.name"] = GameSparks::Core::wstring_to_utf8(deviceInfo->OperatingSystem->Data());
 	ret["model"] = GameSparks::Core::wstring_to_utf8(deviceInfo->SystemProductName->Data());
@@ -998,7 +961,7 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 	ret["model"] = "Xbox One";
 
 	ret["cpu.vendor"] = "AMD";
-	ret["cpu.cores"] = to_string(std::thread::hardware_concurrency());
+	ret["cpu.cores"] = to_string(gsstl::thread::hardware_concurrency());
 
 	ret["os.name"] = "DurangoOS";
 
@@ -1035,23 +998,23 @@ gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 #include <sdk_version.h>
 #include <iomanip>
 
-std::map<std::string, std::string> gs_get_device_stats()
+gsstl::map<gsstl::string, gsstl::string> gs_get_device_stats()
 {
-	std::map<std::string, std::string> ret;
+	gsstl::map<gsstl::string, gsstl::string> ret;
 
 	ret["manufacturer"] = "Sony";
 	ret["model"] = "PS4";
 	ret["memory"] = "8 GB";
 	ret["os.name"] = "ORBIS";
 
-	std::stringstream ss;
-	ss << std::hex
-		<< std::setfill('0')
-		<< std::setw(2) << ((SCE_ORBIS_SDK_VERSION >> (6 * 4)) & 0xff) << "."
-		<< std::setw(3) << ((SCE_ORBIS_SDK_VERSION >> (3 * 4)) & 0xfff) << "."
-		<< std::setw(3) << ((SCE_ORBIS_SDK_VERSION >> (0 * 4)) & 0xfff);
+	gsstl::stringstream ss;
+	ss << gsstl::hex
+		<< gsstl::setfill('0')
+		<< gsstl::setw(2) << ((SCE_ORBIS_SDK_VERSION >> (6 * 4)) & 0xff) << "."
+		<< gsstl::setw(3) << ((SCE_ORBIS_SDK_VERSION >> (3 * 4)) & 0xfff) << "."
+		<< gsstl::setw(3) << ((SCE_ORBIS_SDK_VERSION >> (0 * 4)) & 0xfff);
 	ret["os.version"] = ss.str();
-	ret["cpu.cores"] = to_string(std::thread::hardware_concurrency());
+	ret["cpu.cores"] = to_string(gsstl::thread::hardware_concurrency());
 	ret["cpu.vendor"] = "AMD";
 	//ret["resolution"] = "Sony";
 	return ret;

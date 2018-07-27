@@ -15,7 +15,7 @@ namespace System {
 		//
 		// Properties
 		//
-	    const std::vector<T>& Array() const {
+	    const gsstl::vector<T>& Array() const {
 			return array;
 		}
 
@@ -31,7 +31,7 @@ namespace System {
 
 		/// Construct and ArraySegment that represents the whole of the passed array.
         /// you need to make sure, that the passed array stay around as long as the ArraySegment.
-	    ArraySegment (const std::vector<T>& array_)
+	    ArraySegment (const gsstl::vector<T>& array_)
         :array(array_)
         ,offset(0)
         ,count(int(array.size()))
@@ -39,7 +39,7 @@ namespace System {
 
         /// Construct an ArraySegment to represent a section of the passed array.
         /// you need to make sure, that the passed array stay around as long as the ArraySegment.
-	    ArraySegment (const std::vector<T>& array_, int offset_, int count_)
+	    ArraySegment (const gsstl::vector<T>& array_, int offset_, int count_)
         :array(array_)
         ,offset(offset_)
         ,count(count_)
@@ -62,7 +62,7 @@ namespace System {
         }
 
         private:
-            const std::vector<T>& array;
+            const gsstl::vector<T>& array;
             int offset;
             int count;
     };

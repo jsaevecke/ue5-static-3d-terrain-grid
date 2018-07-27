@@ -81,10 +81,10 @@ namespace GameSparks {
 //#undef GS_USE_CODE_TIMING_ASSERTS
 //#define GS_USE_CODE_TIMING_ASSERTS 1
 #if defined(GS_USE_CODE_TIMING_ASSERTS) && !defined(DOXYGEN)
-#include <chrono>
-#include <iostream>
-#include <iomanip>
-#include <cassert>
+//#include <chrono>
+//#include <iostream>
+//#include <iomanip>
+//include <cassert>
 namespace GameSparks {
 	namespace Util
 	{
@@ -94,7 +94,7 @@ namespace GameSparks {
          */
 		struct CodetimingAssert
 		{
-			CodetimingAssert(const std::string& function, const std::string& file, int line)
+			CodetimingAssert(const gsstl::string& function, const gsstl::string& file, int line)
 				:function(function)
 				,file(file)
 				,line(line)
@@ -107,17 +107,17 @@ namespace GameSparks {
 			~CodetimingAssert()
 			{
 				auto duration = clock::now() - start;
-				if (!inner_did_fail && duration >= std::chrono::microseconds(1000000 / 30))
+				if (!inner_did_fail && duration >= gsstl::chrono::microseconds(1000000 / 30))
 				{
-					auto d = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
-					std::clog << "************************************************************" << std::endl;
-					std::clog << "************************************************************" << std::endl;
-					std::clog << "***** Code timing Assert Failed:" << std::endl;
-					std::clog << "in:" << std::endl << file << "(" << line << ")" << std::endl;
-					std::clog << "function: " << function << std::endl;
-					std::clog << "took: " << std::setw(10) << d << " us" << " (" << std::setprecision(3) << std::setw(11) << (1000000.0 / d) << " Hz" << ")" << std::endl;
-					std::clog << "************************************************************" << std::endl;
-					std::clog << "************************************************************" << std::endl;
+					auto d = gsstl::chrono::duration_cast<gsstl::chrono::microseconds>(duration).count();
+					gsstl::clog << "************************************************************" << gsstl::endl;
+					gsstl::clog << "************************************************************" << gsstl::endl;
+					gsstl::clog << "***** Code timing Assert Failed:" << gsstl::endl;
+					gsstl::clog << "in:" << gsstl::endl << file << "(" << line << ")" << gsstl::endl;
+					gsstl::clog << "function: " << function << gsstl::endl;
+					gsstl::clog << "took: " << gsstl::setw(10) << d << " us" << " (" << gsstl::setprecision(3) << gsstl::setw(11) << (1000000.0 / d) << " Hz" << ")" << gsstl::endl;
+					gsstl::clog << "************************************************************" << gsstl::endl;
+					gsstl::clog << "************************************************************" << gsstl::endl;
 
 					auto& outer = getStack();
 					for (auto& x : outer)
@@ -131,16 +131,16 @@ namespace GameSparks {
 			}
 
 			private:
-				const std::string function;
-				const std::string file;
+				const gsstl::string function;
+				const gsstl::string file;
 				int line;
 				bool inner_did_fail; // indicates, that a CodetimingAssert further down the call-tree did fail
-				typedef std::chrono::high_resolution_clock clock;
+				typedef gsstl::chrono::high_resolution_clock clock;
 				clock::time_point start;
 
-				static std::vector<CodetimingAssert*>& getStack()
+				static gsstl::vector<CodetimingAssert*>& getStack()
 				{
-					static std::vector<CodetimingAssert*> stack;
+					static gsstl::vector<CodetimingAssert*> stack;
 					return stack;
 				}
 		};

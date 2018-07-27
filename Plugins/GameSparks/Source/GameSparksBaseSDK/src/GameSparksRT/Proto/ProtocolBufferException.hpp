@@ -7,7 +7,7 @@ namespace GameSparks { namespace RT { namespace Proto {
 
 	class ProtocolBufferException : public System::Exception
 	{
-		public: ProtocolBufferException(const std::string what) : Exception(what, "ProtocolBufferException") {}
+		public: ProtocolBufferException(const gsstl::string what) : Exception(what, "ProtocolBufferException") {}
 	};
 
 }}} /* namespace GameSparks.RT.Proto */

@@ -26,7 +26,9 @@ char * strptime(const char *buf, const char *fmt, struct tm *tm);
 #include <ctime>
 #include <cctype>
 
-using std::tolower;
+#include <GameSparks/gsstl.h>
+
+using gsstl::tolower;
 
 int strnicmp(const char* s1, const char* s2, size_t n)
 {

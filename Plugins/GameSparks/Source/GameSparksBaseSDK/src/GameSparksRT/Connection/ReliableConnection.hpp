@@ -11,7 +11,7 @@ namespace GameSparks { namespace RT { namespace Connection {
 	class ReliableConnection : public Connection
 	{
 		public:
-			ReliableConnection  (const std::string& remotehost, const std::string& remoteport, IRTSessionInternal* session);
+			ReliableConnection  (const gsstl::string& remotehost, const gsstl::string& remoteport, IRTSessionInternal* session);
 			virtual System::Failable<int> Send(const Commands::RTRequest& request) override;
 			virtual void StopInternal() override;
 

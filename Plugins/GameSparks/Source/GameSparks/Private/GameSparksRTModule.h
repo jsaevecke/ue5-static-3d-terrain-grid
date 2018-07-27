@@ -2,7 +2,7 @@
 
 #include "IGameSparksRT.h"
 #include "Runtime/Engine/Public/Tickable.h"
-#include <string>
+//#include <string>
 
 DECLARE_LOG_CATEGORY_EXTERN(UGameSparksRTModuleLog, Log, All);
 

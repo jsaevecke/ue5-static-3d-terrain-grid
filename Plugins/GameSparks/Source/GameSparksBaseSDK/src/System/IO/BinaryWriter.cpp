@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include "./BinaryWriter.hpp"
 #include "../ArgumentException.hpp"
 
@@ -13,7 +13,7 @@ namespace System { namespace IO {
         {
             if (!stream.CanWrite())
             {
-                std::clog << "cannot create a BinaryWriter for a stream that is not writable" << std::endl;
+                gsstl::clog << "cannot create a BinaryWriter for a stream that is not writable" << gsstl::endl;
                 assert(false);
             }
         }
@@ -21,7 +21,7 @@ namespace System { namespace IO {
         Failable<void> BinaryWriter::Write(float value) {
             if (!stream.CanWrite())
             {
-                std::clog << "cannot create a BinaryWriter for a stream that is not writable" << std::endl;
+                gsstl::clog << "cannot create a BinaryWriter for a stream that is not writable" << gsstl::endl;
                 assert(false);
             }
 
@@ -37,7 +37,7 @@ namespace System { namespace IO {
         Failable<void> BinaryWriter::Write(double value) {
             if (!stream.CanWrite())
             {
-                std::clog << "cannot create a BinaryWriter for a stream that is not writable" << std::endl;
+                gsstl::clog << "cannot create a BinaryWriter for a stream that is not writable" << gsstl::endl;
                 assert(false);
             }
 

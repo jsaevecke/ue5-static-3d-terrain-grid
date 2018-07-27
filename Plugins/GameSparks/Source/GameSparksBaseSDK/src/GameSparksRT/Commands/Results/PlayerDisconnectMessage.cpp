@@ -7,7 +7,7 @@ namespace Com { namespace Gamesparks { namespace Realtime { namespace Proto {
 
 System::Failable<PlayerDisconnectMessage*> PlayerDisconnectMessage::Deserialize(System::IO::Stream& stream)
 {
-    std::unique_ptr<PlayerDisconnectMessage> instance(new PlayerDisconnectMessage());
+    gsstl::unique_ptr<PlayerDisconnectMessage> instance(new PlayerDisconnectMessage());
 
 	for (;;)
     {

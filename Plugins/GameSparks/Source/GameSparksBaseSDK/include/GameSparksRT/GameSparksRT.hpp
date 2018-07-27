@@ -3,7 +3,8 @@
 
 #include "./Forwards.hpp"
 #include "./GSLinking.hpp"
-#include <string>
+#include "../GameSparks/gsstl.h"
+//#include <string>
 #include <functional>
 #include <map>
 
@@ -33,13 +34,13 @@ namespace GameSparks {
 			~GameSparksRTSessionBuilder();
 
 			/// sets the connect token to use for the session. obtained via  MatchmakingRequest::GetAccessToken().GetValue().
-			GameSparksRTSessionBuilder& SetConnectToken(const std::string& connectToken);
+			GameSparksRTSessionBuilder& SetConnectToken(const gsstl::string& connectToken);
 
 			/// sets the host to use for the session. obtained via  MatchmakingRequest::GetHost().GetValue().
-			GameSparksRTSessionBuilder& SetHost(const std::string& host);
+			GameSparksRTSessionBuilder& SetHost(const gsstl::string& host);
 
 			/// sets the port to use for the session. obtained via  MatchmakingRequest::GetPort().GetValue().
-			GameSparksRTSessionBuilder& SetPort(const std::string& port);
+			GameSparksRTSessionBuilder& SetPort(const gsstl::string& port);
 
 			/// sets the port to use for the session. obtained via  MatchmakingRequest::GetPort().GetValue().
 			GameSparksRTSessionBuilder& SetPort(int port);
@@ -53,9 +54,9 @@ namespace GameSparks {
 			// we're using the pimpl idom for the member variables to avoid dll linkage issues
 			struct Pimpl
 			{
-				std::string connectToken;
-				std::string host;
-				std::string port;
+				gsstl::string connectToken;
+				gsstl::string host;
+				gsstl::string port;
 				IRTSessionListener* listener = nullptr;
 			};
 			Pimpl* pimpl;
@@ -63,7 +64,7 @@ namespace GameSparks {
 
 	// instantiation as GS_API to avoid DLL linking issues
 	#if defined(PLATFORM_WINDOWS) && PLATFORM_WINDOWS && defined(GS_BUILDING_DLL)
-	template class GS_API std::function<void(const std::string&)>;
+	template class GS_API gsstl::function<void(const gsstl::string&)>;
 	#endif
 
 	/*!
@@ -157,9 +158,9 @@ namespace GameSparks {
 			};
 
 			static void SetRootLogLevel(LogLevel level);
-			static void SetLogLevel(const std::string& tag, LogLevel level);
-			static std::function<void (const std::string&)> Logger;
-			static bool ShouldLog(const std::string& tag, LogLevel level);
+			static void SetLogLevel(const gsstl::string& tag, LogLevel level);
+			static gsstl::function<void (const gsstl::string&)> Logger;
+			static bool ShouldLog(const gsstl::string& tag, LogLevel level);
 		private:
 			static GameSparksRT::LogLevel logLevel;
 	};

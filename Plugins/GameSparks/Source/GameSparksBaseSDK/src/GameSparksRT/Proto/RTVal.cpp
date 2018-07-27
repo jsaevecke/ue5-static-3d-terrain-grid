@@ -21,12 +21,12 @@ RTVal::RTVal() {}
 RTVal::RTVal(int64_t value) : long_val(value) {}
 RTVal::RTVal(float value) : float_val(value) {}
 RTVal::RTVal(double value) : double_val(value) {}
-RTVal::RTVal(const std::string &value) : string_val(value) {}
+RTVal::RTVal(const gsstl::string &value) : string_val(value) {}
 RTVal::RTVal(const RTData &value) : data_val(value) {}
 RTVal::RTVal(const RTVector &value) : vec_val(value) {}
 
 
-std::ostream &operator<<(std::ostream &os, const RTVal &val) {
+gsstl::ostream &operator<<(gsstl::ostream &os, const RTVal &val) {
          if(val.long_val.HasValue()) os << val.long_val.Value();
     else if(val.float_val.HasValue()) os << val.float_val.Value();
     else if(val.double_val.HasValue()) os << val.double_val.Value();

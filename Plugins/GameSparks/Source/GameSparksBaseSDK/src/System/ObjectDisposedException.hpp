@@ -7,7 +7,7 @@ namespace System {
 
 	class ObjectDisposedException : public InvalidOperationException
 	{
-		public: ObjectDisposedException(const std::string what) : InvalidOperationException(what, "System.ObjectDisposedException") {}
+		public: ObjectDisposedException(const gsstl::string what) : InvalidOperationException(what, "System.ObjectDisposedException") {}
 	};
 
 } /* namespace System */

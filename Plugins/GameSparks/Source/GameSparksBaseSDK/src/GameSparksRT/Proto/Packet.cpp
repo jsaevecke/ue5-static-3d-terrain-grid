@@ -181,7 +181,7 @@ System::Failable<void> Packet::DeserializeLengthDelimited(System::IO::Stream &st
         }
     }
 
-    assert(instance.OpCode != std::numeric_limits<int>::lowest());
+    assert(instance.OpCode != gsstl::numeric_limits<int>::lowest());
     return {};
 }
 

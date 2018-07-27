@@ -1,7 +1,7 @@
 
 #include "../../include/GameSparksRT/GameSparksRT.hpp"
-#include <ostream>
-#include <iostream>
+//#include <ostream>
+//#include <iostream>
 #include "./RTSessionImpl.hpp"
 
 namespace GameSparks { namespace RT {
@@ -17,18 +17,18 @@ GameSparksRTSessionBuilder::~GameSparksRTSessionBuilder()
 }
 
 
-GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetConnectToken(const std::string& connectToken_){
+GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetConnectToken(const gsstl::string& connectToken_){
     this->pimpl->connectToken = connectToken_;
     return *this;
 }
 
-GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetHost(const std::string& host_){
+GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetHost(const gsstl::string& host_){
     this->pimpl->host = host_;
     return *this;
 }
 
 /// sets TcpPort and FastPort to the same value
-GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetPort(const std::string& port_){
+GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetPort(const gsstl::string& port_){
     this->pimpl->port = port_;
     return *this;
 }
@@ -37,7 +37,7 @@ GameSparksRTSessionBuilder& GameSparksRTSessionBuilder::SetPort(int _port) {
 	assert(_port > 0);
 	assert(_port <= 65535);
 
-	std::stringstream ss;
+	gsstl::stringstream ss;
 	ss << _port;
 	this->pimpl->port = ss.str();
 	return *this;
@@ -62,10 +62,10 @@ IRTSession* GameSparksRTSessionBuilder::Build() const{
 }
 
 // not a member variable to avoid DLL linking issues
-static std::map<std::string, GameSparksRT::LogLevel> tagLevels;
+static gsstl::map<gsstl::string, GameSparksRT::LogLevel> tagLevels;
 
-std::function<void (const std::string&)> GameSparksRT::Logger = [](const std::string& msg){
-    std::clog << msg << std::endl;
+gsstl::function<void (const gsstl::string&)> GameSparksRT::Logger = [](const gsstl::string& msg){
+    gsstl::clog << msg << gsstl::endl;
 };
 
 GameSparksRT::LogLevel GameSparksRT::logLevel = GameSparksRT::LogLevel::LL_ERROR;
@@ -75,11 +75,11 @@ void GameSparksRT::SetRootLogLevel(GameSparksRT::LogLevel level) {
     logLevel = level;
 }
 
-void GameSparksRT::SetLogLevel(const std::string &tag, GameSparksRT::LogLevel level) {
-    tagLevels.insert(std::make_pair(tag, level));
+void GameSparksRT::SetLogLevel(const gsstl::string &tag, GameSparksRT::LogLevel level) {
+    tagLevels.insert(gsstl::make_pair(tag, level));
 }
 
-bool GameSparksRT::ShouldLog(const std::string &tag, GameSparksRT::LogLevel level) {
+bool GameSparksRT::ShouldLog(const gsstl::string &tag, GameSparksRT::LogLevel level) {
     auto pos = tagLevels.find(tag);
     if(pos != tagLevels.end()){
         return pos->second >= level;

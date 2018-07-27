@@ -42,7 +42,7 @@ namespace GameSparks { namespace RT { namespace Commands {
 		protected:
 			RTData Data;
 			int OpCode;
-			std::list<int> TargetPlayers;
+			gsstl::list<int> TargetPlayers;
 			GameSparksRT::DeliveryIntent intent;
 
 		private:

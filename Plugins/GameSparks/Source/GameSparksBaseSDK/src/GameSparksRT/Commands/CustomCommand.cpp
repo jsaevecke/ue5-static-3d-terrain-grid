@@ -1,5 +1,5 @@
 #include "../../../include/GameSparksRT/Proto/RTVal.hpp"
-#include <iostream>
+//#include <iostream>
 #include "./CustomCommand.hpp"
 #include "../IRTSessionInternal.hpp"
 
@@ -8,7 +8,7 @@ namespace GameSparks { namespace RT {
 
 System::Failable<CustomCommand*> CustomCommand::Deserialize(int opCode, int sender, System::IO::Stream& lps, const RTData& data, int limit, const IRTSessionInternal& session)
 {
-    std::unique_ptr<CustomCommand> instance(new CustomCommand(opCode, sender, data, limit, session));
+    gsstl::unique_ptr<CustomCommand> instance(new CustomCommand(opCode, sender, data, limit, session));
     GS_CALL_OR_THROW(lps.Read(instance->payload, 0, limit));
     return instance.release();
 }
@@ -32,7 +32,7 @@ void CustomCommand::Execute()
     }
     else
     {
-        std::clog << "INFO: no session SessionListener registered on session." << std::endl;
+        gsstl::clog << "INFO: no session SessionListener registered on session." << gsstl::endl;
     }
 }
 
