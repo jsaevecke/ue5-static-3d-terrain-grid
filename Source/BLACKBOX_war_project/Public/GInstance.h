@@ -23,7 +23,11 @@ class BLACKBOX_WAR_PROJECT_API UGInstance : public UGameInstance
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameSpark")
 	class UGameSparksObject* GameSparksObject;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
+	TMap<EState, TSubclassOf<UUserWidget>> StateWidgetBlueprints;
 private:
+	UPROPERTY()
+	TMap<EState, UUserWidget*> StateWidgets;
 	EState CurrentState;
 public:
 	UGInstance();

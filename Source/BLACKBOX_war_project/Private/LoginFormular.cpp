@@ -2,7 +2,7 @@
 
 #include "LoginFormular.h"
 
-void ULoginFormular::OnLogin()
+void ULoginFormular::OnSignIn()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnLogin called"));
+	UE_LOG(LogTemp, Warning, TEXT("OnSignIncalled"));
 }

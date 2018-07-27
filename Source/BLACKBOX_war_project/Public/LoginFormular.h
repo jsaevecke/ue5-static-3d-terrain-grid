@@ -17,5 +17,5 @@ public:
 	FString Password;
 public:
 	UFUNCTION(BlueprintCallable, Category="Authentication")
-	void OnLogin();
+	void OnSignIn();
 };
