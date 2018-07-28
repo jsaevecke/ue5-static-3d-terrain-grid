@@ -22,8 +22,6 @@ public:
 	FString Email;
 	UPROPERTY(BlueprintReadWrite, Category = "Authentication")
 	FString Password;
-	UPROPERTY(BlueprintReadWrite, Category = "Authentication")
-	FString PasswordConfirmation;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Authentication")

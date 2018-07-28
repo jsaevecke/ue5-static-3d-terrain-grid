@@ -2,74 +2,85 @@
 
 #include "StaticGameSparkLibrary.h"
 
-UWorld* UStaticGameSparkLibrary::World = nullptr;
-bool UStaticGameSparkLibrary::bInitialized = false;
-
-void UStaticGameSparkLibrary::InitStatics(UWorld* CurrentWorld)
-{
-	if (!bInitialized)
-	{
-		World = CurrentWorld;
-		bInitialized = true;
-	}
-}
 void UStaticGameSparkLibrary::LoginRequestResponse(GameSparks::Core::GS& GameSpark, const GameSparks::Api::Responses::AuthenticationResponse& Response)
 {
-	if (bInitialized)
+	if (!Response.GetHasErrors())
 	{
-		if (!Response.GetHasErrors())
+		GameSparks::Api::Requests::AccountDetailsRequest AccountDetailsRequest(GameSpark);
+		AccountDetailsRequest.Send(LoginSuccessDetailsResponse);
+	}
+	else
+	{
+		if (GEngine)
 		{
-			GameSparks::Api::Requests::AccountDetailsRequest AccountDetailsRequest(GameSpark);
-			AccountDetailsRequest.Send(LoginSuccessDetailsResponse);
-		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Login Failed"));
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Login Failed"));
 		}
 	}
 }
 void UStaticGameSparkLibrary::LoginSuccessDetailsResponse(GameSparks::Core::GS& GameSpark, const GameSparks::Api::Responses::AccountDetailsResponse& Response)
 {
-	if (bInitialized)
+	if (!Response.GetHasErrors())
 	{
-		if (!Response.GetHasErrors())
+		if (GEngine)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), Response.GetJSONString().c_str());
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), Response.GetJSONString().c_str());
 		}
-		else
+	}
+	else
+	{
+		if (GEngine)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Account Details Request Failed"));
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Account Details Request Failed"));
 		}
 	}
 }
 void UStaticGameSparkLibrary::RegistrationRequestResponse(GameSparks::Core::GS& GameSpark, const GameSparks::Api::Responses::RegistrationResponse& Response)
 {
-	if (bInitialized)
+	if (!Response.GetHasErrors())
 	{
-		if (!Response.GetHasErrors())
+		if (GEngine)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Registration Successful!"));
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), Response.GetJSONString().c_str());
-			}
-		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Registration Failed"));
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Registration Successful!"));
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), Response.GetJSONString().c_str());
 		}
 	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Registration Failed"));
+		}
+	}
+}
+
+void UStaticGameSparkLibrary::Login(FString Username, FString Password)
+{
+	if (Username.IsEmpty() || Password.IsEmpty())
+	{
+		return;
+	}
+
+	GameSparks::Core::GS& GameSpark = UGameSparksModule::GetModulePtr()->GetGSInstance();
+
+	GameSparks::Api::Requests::AuthenticationRequest Request(GameSpark);
+	Request.SetUserName(std::string(TCHAR_TO_UTF8(*Username)));
+	Request.SetPassword(std::string(TCHAR_TO_UTF8(*Password)));
+	Request.Send(LoginRequestResponse);
+}
+
+void UStaticGameSparkLibrary::Register(FString Username, FString Displayname, FString Email, FString Password)
+{
+	if (Username.IsEmpty() || Displayname.IsEmpty() || Email.IsEmpty()|| Password.IsEmpty())
+	{
+		return;
+	}
+
+	GameSparks::Core::GS& GameSpark = UGameSparksModule::GetModulePtr()->GetGSInstance();
+
+	GameSparks::Api::Requests::RegistrationRequest Request(GameSpark);
+	Request.SetDisplayName(std::string(TCHAR_TO_UTF8(*Username)));
+	Request.SetUserName(std::string(TCHAR_TO_UTF8(*Username)));
+	Request.SetPassword(std::string(TCHAR_TO_UTF8(*Password)));
+	Request.Send(RegistrationRequestResponse);
 }
 

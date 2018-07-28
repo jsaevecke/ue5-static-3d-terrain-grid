@@ -28,7 +28,7 @@ bool URegisterFormular::IsEmailValid()
 
 bool URegisterFormular::IsPasswordValid()
 {
-	return !Password.IsEmpty() && !PasswordConfirmation.IsEmpty() && Password.Equals(PasswordConfirmation);
+	return !Password.IsEmpty();
 }
 
 bool URegisterFormular::IsFormularValid()

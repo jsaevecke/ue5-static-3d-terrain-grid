@@ -18,4 +18,11 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category="Authentication")
 	void OnSignIn();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Validation")
+	bool IsUsernameValid();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Validation")
+	bool IsPasswordValid();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Validation")
+	bool IsFormularValid();
 };
