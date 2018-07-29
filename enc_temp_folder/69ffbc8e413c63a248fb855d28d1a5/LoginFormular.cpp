@@ -33,7 +33,11 @@ void ULoginFormular::Login(FString Username, FString Password)
 
 	SetIsEnabled(false);
 
-	ShowLoadingIndicator();
+	if (!IsValid(LoadingIndicatorWidget) && IsValid(LoadingIndicatorBlueprint))
+		LoadingIndicatorWidget = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
+
+	if (IsValid(LoadingIndicatorWidget) && !LoadingIndicatorWidget->IsInViewport())
+		LoadingIndicatorWidget->AddToViewport();
 
 	auto& GameSpark = UGameSparksModule::GetModulePtr()->GetGSInstance();
 
@@ -68,37 +72,22 @@ void ULoginFormular::Login(FString Username, FString Password)
 				}
 				else
 				{
-					// Todo
 					GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("AccountDetails Failed"));
 				}
 			});
 		}
 		else
 		{
-			// Todo
 			if (GEngine)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Login Failed"));
 			}
 		}
 
-		HideLoadingIndicator();
+		if (IsValid(LoadingIndicatorWidget) && LoadingIndicatorWidget->IsInViewport())
+			LoadingIndicatorWidget->RemoveFromParent();
+
 		SetIsEnabled(true);
 	});
-}
-
-void ULoginFormular::ShowLoadingIndicator()
-{
-	if (!IsValid(LoadingIndicatorWidget) && IsValid(LoadingIndicatorBlueprint))
-		LoadingIndicatorWidget = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
-
-	if (IsValid(LoadingIndicatorWidget) && !LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->AddToViewport();
-}
-
-void ULoginFormular::HideLoadingIndicator()
-{
-	if (IsValid(LoadingIndicatorWidget) && LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->RemoveFromParent();
 }
 

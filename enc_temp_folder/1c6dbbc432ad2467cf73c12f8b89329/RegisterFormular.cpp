@@ -40,7 +40,12 @@ void URegisterFormular::Register(FString Username, FString Displayname, FString 
 	}
 
 	SetIsEnabled(false);
-	ShowLoadingIndicator();
+
+	if (!IsValid(LoadingIndicatorWidget) && IsValid(LoadingIndicatorBlueprint))
+		LoadingIndicatorWidget = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
+
+	if (IsValid(LoadingIndicatorWidget) && !LoadingIndicatorWidget->IsInViewport())
+		LoadingIndicatorWidget->AddToViewport();
 
 	auto& GameSpark = UGameSparksModule::GetModulePtr()->GetGSInstance();
 
@@ -55,40 +60,23 @@ void URegisterFormular::Register(FString Username, FString Displayname, FString 
 	Request.Send([&](GameSparks::Core::GS& GameSpark, const GameSparks::Api::Responses::RegistrationResponse& Response){
 		if (!Response.GetHasErrors())
 		{
-			// Todo
 			if (GEngine)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Registration Successful!"));
 			}
+
+			
 		}
 		else
 		{
-			// Todo
 			if (GEngine)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Registration Failed"));
 			}
-			
+			SetIsEnabled(true);
 		}
 
-		SetIsEnabled(true);
-		HideLoadingIndicator();
+		if (IsValid(LoadingIndicatorWidget) && LoadingIndicatorWidget->IsInViewport())
+			LoadingIndicatorWidget->RemoveFromParent();
 	});
-}
-
-// Todo: Replicated code (Loginformular)
-
-void URegisterFormular::ShowLoadingIndicator()
-{
-	if (!IsValid(LoadingIndicatorWidget) && IsValid(LoadingIndicatorBlueprint))
-		LoadingIndicatorWidget = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
-
-	if (IsValid(LoadingIndicatorWidget) && !LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->AddToViewport();
-}
-
-void URegisterFormular::HideLoadingIndicator()
-{
-	if (IsValid(LoadingIndicatorWidget) && LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->RemoveFromParent();
 }

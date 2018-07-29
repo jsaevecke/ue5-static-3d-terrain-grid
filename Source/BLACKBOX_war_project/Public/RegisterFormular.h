@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GameSparks/Private/GSApi.h"
+#include "GameSparks/Public/GameSparksModule.h"
 #include "RegisterFormular.generated.h"
 
 /**
@@ -24,6 +26,11 @@ public:
 	FString Password;
 	UPROPERTY(BlueprintReadWrite, Category = "Authentication")
 	FString PasswordConfirmation;
+	UPROPERTY(BlueprintReadWrite, Category = "Loading")
+	TSubclassOf<UUserWidget> LoadingIndicatorBlueprint;
+
+private:
+	UUserWidget * LoadingIndicatorWidget;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Authentication")
@@ -39,4 +46,9 @@ public:
 	bool IsPasswordValid();
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Validation")
 	bool IsFormularValid();
+
+private:
+	void Register(FString Username, FString Displayname, FString Email, FString Password);
+	void ShowLoadingIndicator();
+	void HideLoadingIndicator();
 };

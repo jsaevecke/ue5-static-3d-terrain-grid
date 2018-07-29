@@ -34,8 +34,5 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Validation")
 	bool IsFormularValid();
 
-private:
 	void Login(FString Username, FString Password);
-	void ShowLoadingIndicator();
-	void HideLoadingIndicator();
 };
