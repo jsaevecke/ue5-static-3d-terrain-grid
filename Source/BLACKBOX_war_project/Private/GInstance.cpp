@@ -26,6 +26,23 @@ EState UGInstance::GetState()
 	return CurrentState;
 }
 
+void UGInstance::ShowLoadingIndicator(bool bShow)
+{
+	check(IsValid(LoadingIndicatorBlueprint));
+
+	if(!IsValid(LoadingIndicator))
+		LoadingIndicator = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
+
+	if (IsValid(LoadingIndicator))
+	{
+		if (!bShow && LoadingIndicator->IsInViewport())
+			LoadingIndicator->RemoveFromParent();
+		if (bShow && !LoadingIndicator->IsInViewport())
+			LoadingIndicator->AddToViewport();
+	}
+}
+		
+
 void UGInstance::Init()
 {
 	UGameInstance::Init();
@@ -56,6 +73,7 @@ void UGInstance::OnStateChange(EState NewState)
 		
 		ActiveStateWidget = StateWidgets[NewState];
 		ActiveStateWidget->AddToViewport();
+
 		return;
 	}
 

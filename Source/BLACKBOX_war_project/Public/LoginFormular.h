@@ -17,11 +17,6 @@ public:
 	FString Username;
 	UPROPERTY(BlueprintReadWrite, Category="Authentication")
 	FString Password;
-	UPROPERTY(BlueprintReadWrite, Category = "Loading")
-	TSubclassOf<UUserWidget> LoadingIndicatorBlueprint;
-
-private:
-	UUserWidget* LoadingIndicatorWidget;
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Authentication")
@@ -36,6 +31,4 @@ public:
 
 private:
 	void Login(FString Username, FString Password);
-	void ShowLoadingIndicator();
-	void HideLoadingIndicator();
 };

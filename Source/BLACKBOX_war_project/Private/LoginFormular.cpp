@@ -32,8 +32,7 @@ void ULoginFormular::Login(FString Username, FString Password)
 	}
 
 	SetIsEnabled(false);
-
-	ShowLoadingIndicator();
+	Cast<UGInstance>(GetGameInstance())->ShowLoadingIndicator(true);
 
 	auto& GameSpark = UGameSparksModule::GetModulePtr()->GetGSInstance();
 
@@ -48,7 +47,8 @@ void ULoginFormular::Login(FString Username, FString Password)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("Login Success"));
 			}
-			
+
+
 			auto Request = GameSparks::Api::Requests::AccountDetailsRequest{ GameSpark };
 			Request.Send([&](GameSparks::Core::GS& GameSpark, const GameSparks::Api::Responses::AccountDetailsResponse& Response)
 			{
@@ -56,15 +56,16 @@ void ULoginFormular::Login(FString Username, FString Password)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::MakeRandomColor(), TEXT("AccountDetails Success"));
 
-					auto* PlayerState = Cast<APState>(GetWorld()->GetFirstPlayerController()->PlayerState);
-							
+					auto* PState = Cast<APState>(GetWorld()->GetFirstPlayerController()->PlayerState);
+
 					if (Response.GetDisplayName().HasValue())
-						PlayerState->Displayname = UTF8_TO_TCHAR(Response.GetDisplayName().GetValue().c_str());
+						PState->Displayname = UTF8_TO_TCHAR(Response.GetDisplayName().GetValue().c_str());
 					if (Response.GetUserId().HasValue())
-						PlayerState->UserId = UTF8_TO_TCHAR(Response.GetUserId().GetValue().c_str());
-				
-					auto* GameInstance = Cast<UGInstance>(GetGameInstance());
-					GameInstance->ChangeState(EState::MainMenu);
+						PState->UserId = UTF8_TO_TCHAR(Response.GetUserId().GetValue().c_str());
+
+					auto* GInstance = Cast<UGInstance>(GetGameInstance());
+					GInstance->ShowLoadingIndicator(false);
+					GInstance->ChangeState(EState::Lobby);
 				}
 				else
 				{
@@ -82,23 +83,7 @@ void ULoginFormular::Login(FString Username, FString Password)
 			}
 		}
 
-		HideLoadingIndicator();
+		Cast<UGInstance>(GetGameInstance())->ShowLoadingIndicator(false);
 		SetIsEnabled(true);
 	});
 }
-
-void ULoginFormular::ShowLoadingIndicator()
-{
-	if (!IsValid(LoadingIndicatorWidget) && IsValid(LoadingIndicatorBlueprint))
-		LoadingIndicatorWidget = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
-
-	if (IsValid(LoadingIndicatorWidget) && !LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->AddToViewport();
-}
-
-void ULoginFormular::HideLoadingIndicator()
-{
-	if (IsValid(LoadingIndicatorWidget) && LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->RemoveFromParent();
-}
-

@@ -1,6 +1,7 @@
 // Copyright 2018, Julien Saevecke, All rights reserved.
 
 #include "RegisterFormular.h"
+#include "GInstance.h"
 
 void URegisterFormular::OnRegister()
 {
@@ -40,7 +41,7 @@ void URegisterFormular::Register(FString Username, FString Displayname, FString 
 	}
 
 	SetIsEnabled(false);
-	ShowLoadingIndicator();
+	Cast<UGInstance>(GetGameInstance())->ShowLoadingIndicator(true);
 
 	auto& GameSpark = UGameSparksModule::GetModulePtr()->GetGSInstance();
 
@@ -72,23 +73,6 @@ void URegisterFormular::Register(FString Username, FString Displayname, FString 
 		}
 
 		SetIsEnabled(true);
-		HideLoadingIndicator();
+		Cast<UGInstance>(GetGameInstance())->ShowLoadingIndicator(false);
 	});
-}
-
-// Todo: Replicated code (Loginformular)
-
-void URegisterFormular::ShowLoadingIndicator()
-{
-	if (!IsValid(LoadingIndicatorWidget) && IsValid(LoadingIndicatorBlueprint))
-		LoadingIndicatorWidget = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
-
-	if (IsValid(LoadingIndicatorWidget) && !LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->AddToViewport();
-}
-
-void URegisterFormular::HideLoadingIndicator()
-{
-	if (IsValid(LoadingIndicatorWidget) && LoadingIndicatorWidget->IsInViewport())
-		LoadingIndicatorWidget->RemoveFromParent();
 }

@@ -4,6 +4,8 @@
 #include "GInstance.h"
 #include "Public/GameSparksModule.h"
 #include "Private/GameSparksObject.h"
+#include "GameSparks/Private/GSApi.h"
+#include "PState.h"
 
 
 APController::APController()
@@ -18,6 +20,13 @@ void APController::OnGameSparksAvailable(bool bAvailable)
 	{
 		if (IsValid(GEngine))
 			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Connected to gamesparks"));
+
+		auto* GInstance = Cast<UGInstance>(GetGameInstance());
+		
+		GInstance->ShowLoadingIndicator(false);
+
+		if (GInstance->GetState() == EState::None)
+			GInstance->ChangeState(EState::Authentication);
 	}
 	else
 	{
@@ -33,6 +42,7 @@ void APController::OnGameSparksAvailable(bool bAvailable)
 		}
 		else
 		{
+			// Todo
 			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Could not connect to gamesparks. After max. %i tries."), ConnectionMaxTries);
 		}
 	}
@@ -40,17 +50,20 @@ void APController::OnGameSparksAvailable(bool bAvailable)
 
 void APController::OnConnect()
 {
-	auto* GameInstance = Cast<UGInstance>(GetGameInstance());
-	GameInstance->GameSparksObject->Connect("v356285XYYnC", "KEUTGVaTqY1cfqGbwl6Z7xFhfrTeUBxX");
+	Cast<UGInstance>(GetGameInstance())->GameSparksObject->Connect("v356285XYYnC", "KEUTGVaTqY1cfqGbwl6Z7xFhfrTeUBxX");
 }
 
 void APController::BeginPlay()
 {
-	auto* GameInstance = Cast<UGInstance>(GetGameInstance());
+	auto* GInstance = Cast<UGInstance>(GetGameInstance());
 
-	check(IsValid(GameInstance->GameSparksObject));
+	check(IsValid(GInstance->GameSparksObject));
 
-	GameInstance->GameSparksObject->OnGameSparksAvailableDelegate.AddDynamic(this, &APController::OnGameSparksAvailable);
-	GameInstance->GameSparksObject->Disconnect();
-	GameInstance->GameSparksObject->Connect("v356285XYYnC", "KEUTGVaTqY1cfqGbwl6Z7xFhfrTeUBxX");
+	if (!GInstance->GameSparksObject->IsAvailable())
+	{
+		GInstance->GameSparksObject->OnGameSparksAvailableDelegate.AddDynamic(this, &APController::OnGameSparksAvailable);
+		GInstance->GameSparksObject->Disconnect();
+		GInstance->GameSparksObject->Connect("v356285XYYnC", "KEUTGVaTqY1cfqGbwl6Z7xFhfrTeUBxX");
+		GInstance->ShowLoadingIndicator(true);
+	}
 }
