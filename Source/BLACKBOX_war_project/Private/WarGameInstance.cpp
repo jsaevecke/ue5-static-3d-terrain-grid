@@ -5,20 +5,22 @@
 
 #include "Blueprint/UserWidget.h"
 
+//Note: Consider to create an instance for each state on init - to remove the possibility of delayed transition between widgets
+
 UWarGameInstance::UWarGameInstance()
 	: CurrentState(EState::None)
 {
 }
 
-void UWarGameInstance::ChangeState(EState NewState)
+void UWarGameInstance::ChangeState(EState newState)
 {
-	check(NewState != EState::None);
+	check(newState != EState::None);
 
-	if (NewState != CurrentState)
+	if (newState != CurrentState)
 	{
-		OnStateChange(NewState);
+		OnStateChange(newState);
 
-		CurrentState = NewState;
+		CurrentState = newState;
 	}
 }
 
@@ -27,51 +29,42 @@ EState UWarGameInstance::GetState()
 	return CurrentState;
 }
 
-void UWarGameInstance::ShowLoadingIndicator(bool bShow)
+void UWarGameInstance::ShowLoadingIndicator(bool showIndicator)
 {
-	check(IsValid(LoadingIndicatorBlueprint));
+	if (!IsValid(LoadingIndicatorBlueprint))
+		return;
 
 	if (!IsValid(LoadingIndicator))
 		LoadingIndicator = CreateWidget<UUserWidget>(this, LoadingIndicatorBlueprint);
 
 	if (IsValid(LoadingIndicator))
 	{
-		if (!bShow && LoadingIndicator->IsInViewport())
+		if (!showIndicator && LoadingIndicator->IsInViewport())
 			LoadingIndicator->RemoveFromParent();
-		if (bShow && !LoadingIndicator->IsInViewport())
+		if (showIndicator && !LoadingIndicator->IsInViewport())
 			LoadingIndicator->AddToViewport();
 	}
 }
 
-
-void UWarGameInstance::Init()
+void UWarGameInstance::OnStateChange(EState newState)
 {
-	UGameInstance::Init();
-}
+	//Assume that OnStateChange only gets calles with a valid state
+	check(StateWidgetBlueprints.Contains(newState));
 
-void UWarGameInstance::Shutdown()
-{
-	UGameInstance::Shutdown();
-}
-
-void UWarGameInstance::OnStateChange(EState NewState)
-{
-	if (StateWidgetBlueprints.Contains(NewState))
+	//Create the widget if no instance already exists
+	if (!StateWidgets.Contains(newState))
 	{
-		if (!StateWidgets.Contains(NewState))
-		{
-			auto Widget = CreateWidget<UUserWidget>(this, StateWidgetBlueprints[NewState]);
-			StateWidgets.Add(NewState, Widget);
-		}
-
-		if (IsValid(ActiveStateWidget))
-			ActiveStateWidget->RemoveFromParent();
-
-		ActiveStateWidget = StateWidgets[NewState];
-		ActiveStateWidget->AddToViewport();
-
-		return;
+		auto Widget = CreateWidget<UUserWidget>(this, StateWidgetBlueprints[newState]);
+		StateWidgets.Add(newState, Widget);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("State widget does not exist for this state"));
+	//Remove the active widget from the viewport
+	if (IsValid(ActiveStateWidget))
+		ActiveStateWidget->RemoveFromParent();
+
+	//Add the new state widget to the viewport
+	ActiveStateWidget = StateWidgets[newState];
+	ActiveStateWidget->AddToViewport();
+
+	return;
 }

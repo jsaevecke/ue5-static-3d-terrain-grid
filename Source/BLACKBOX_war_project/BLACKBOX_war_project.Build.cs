@@ -8,6 +8,7 @@ public class BLACKBOX_war_project : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "OnlineSubsystem", "Slate", "SlateCore", "UMG" });
-	}
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Landscape", "OnlineSubsystem", "OnlineSubsystemUtils" , "Slate", "SlateCore", "UMG" });
+        DynamicallyLoadedModuleNames.Add("OnlineSubsystemNull");
+    }
 }

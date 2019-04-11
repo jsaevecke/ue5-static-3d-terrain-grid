@@ -24,7 +24,9 @@ bool UStaticGridLibrary::IsWalkable(UWorld* const World, const FVector& WorldPos
 
 	const auto TraceTag = FName{ "MyTraceTag" };
 
+#if WITH_EDITOR
 	World->DebugDrawTraceTag = TraceTag;
+#endif
 
 	auto Params = FCollisionQueryParams{};
 	Params.TraceTag = TraceTag;

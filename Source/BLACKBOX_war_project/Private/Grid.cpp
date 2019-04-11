@@ -248,7 +248,9 @@ void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
 
+#if WITH_EDITOR
 	this->SetFolderPath(GridFolder);
+#endif
 
 	Spawn();
 }

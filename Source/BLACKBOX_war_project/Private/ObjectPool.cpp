@@ -16,7 +16,9 @@ void AObjectPool::BeginPlay()
 {
 	Super::BeginPlay();
 
+#if WITH_EDITOR
 	this->SetFolderPath(PoolFolder);
+#endif
 
 	ReserveObjects();
 }
@@ -35,7 +37,9 @@ AActor* const AObjectPool::CreateObject(bool bInUse, bool bHide)
 	{
 		auto Object = GetWorld()->SpawnActor(ObjectToPool);
 		Object->SetActorHiddenInGame(bHide);
+#if WITH_EDITOR
 		Object->SetFolderPath(ObjectFolder);
+#endif
 
 		CurrentObjectCount = CurrentObjectCount + 1;
 

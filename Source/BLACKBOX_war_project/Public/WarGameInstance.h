@@ -4,14 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "UnrealNetwork.h"
+#include <Online.h>
 #include "WarGameInstance.generated.h"
 
 UENUM(BlueprintType)
 enum class EState : uint8
 {
 	None UMETA(DisplayName = "None"),
-	Authentication UMETA(DisplayName = "Authentication"),
-	Lobby UMETA(DisplayName = "Lobby"),
+	MainMenu UMETA(DisplayName = "Main"),
+	HostMenu UMETA(DisplayName = "Host"),
+	ServerMenu UMETA(DisplayName = "Server"),
+	OptionsMenu UMETA(DisplayName = "Options"),
 	Game UMETA(DisplayName = "Game")
 };
 
@@ -22,34 +26,33 @@ class BLACKBOX_WAR_PROJECT_API UWarGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
-		TMap<EState, TSubclassOf<UUserWidget>> StateWidgetBlueprints;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
-		TSubclassOf<UUserWidget> LoadingIndicatorBlueprint;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WarGame|State")
+	TMap<EState, TSubclassOf<UUserWidget>> StateWidgetBlueprints;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WarGame|State")
+	TSubclassOf<UUserWidget> LoadingIndicatorBlueprint;
 
 private:
 	UPROPERTY()
-		TMap<EState, UUserWidget*> StateWidgets;
+	TMap<EState, UUserWidget*> StateWidgets;
 	UPROPERTY()
-		UUserWidget* ActiveStateWidget;
+	UUserWidget* ActiveStateWidget;
 	UPROPERTY()
-		UUserWidget* LoadingIndicator;
+	UUserWidget* LoadingIndicator;
+
 	EState CurrentState;
+	TSharedPtr<FOnlineSessionSettings> SessionSettings;
 
 public:
 	UWarGameInstance();
 	~UWarGameInstance() = default;
 
-	UFUNCTION(BlueprintCallable, Category = "State")
-		void ChangeState(EState NewState);
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "State")
-		EState GetState();
-	UFUNCTION(BlueprintCallable, Category = "State")
-		void ShowLoadingIndicator(bool bShow);
+	UFUNCTION(BlueprintCallable, Category = "WarGame|State")
+	void ChangeState(EState newState);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WarGame|State")
+	EState GetState();
+	UFUNCTION(BlueprintCallable, Category = "WarGame|State")
+	void ShowLoadingIndicator(bool showIndicator);
 
 private:
-	virtual void Init() override;
-	virtual void Shutdown() override;
-
-	void OnStateChange(EState NewState);
+	void OnStateChange(EState newState);
 };
